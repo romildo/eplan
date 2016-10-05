@@ -10,7 +10,7 @@
   <packaging>jar</packaging>
   
   <name>EPlan compiler</name>
-  <url>http://maven.apache.org</url>
+  <url>https://github.com/romildo/eplan</url>
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
