@@ -29,9 +29,6 @@
             <goals>
               <goal>generate</goal>
             </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/generated-sources/jflex</outputDirectory>
-            </configuration>
           </execution>
         </executions>
       </plugin>
