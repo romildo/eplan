@@ -66,6 +66,31 @@
           </archive>
         </configuration>
       </plugin>
+
+      <plugin>
+	<groupId>org.apache.maven.plugins</groupId>
+	<artifactId>maven-shade-plugin</artifactId>
+        <version>2.4.3</version>
+	<executions>
+	  <execution>
+	    <phase>package</phase>
+	    <goals>
+	      <goal>shade</goal>
+	    </goals>
+            <configuration>
+              <transformers>
+                <!-- add Main-Class to manifest file -->
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>main.LexerDriver</mainClass>
+                </transformer>
+              </transformers>
+            </configuration>
+	  </execution>
+	</executions>
+	<configuration>
+	  <finalName>uber-${project.artifactId}-${project.version}</finalName>
+	</configuration>
+      </plugin>
     </plugins>
   </build>
   
