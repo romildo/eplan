@@ -1,21 +1,23 @@
+package parse;
+
+import java_cup.runtime.Symbol;
 
 %%
 
 %public
-%integer
+%cup
 
 %%
 
 [ \t\f\n\r]+         { /* skip */ }
 
-[0-9]+ ("." [0-9]+)? { return 10; }
+[0-9]+ ("." [0-9]+)? { return new Symbol(sym.LITINT, yytext()); }
 
-"+"                  { return 21; }
-"-"                  { return 22; }
-"*"                  { return 23; }
-"/"                  { return 24; }
-
-"("                  { return 31; }
-")"                  { return 32; }
+"+"                  { return new Symbol(sym.PLUS); }
+"-"                  { return new Symbol(sym.MINUS); }
+"*"                  { return new Symbol(sym.TIMES); }
+"/"                  { return new Symbol(sym.DIV); }
+"("                  { return new Symbol(sym.LPAREN); }
+")"                  { return new Symbol(sym.RPAREN); }
 
 .                    { System.out.printf("unexpected char |%s|\n", yytext()); }
