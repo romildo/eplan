@@ -39,7 +39,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>LexerDriver</mainClass>
+              <mainClass>main.LexerDriver</mainClass>
             </manifest>
           </archive>
         </configuration>
