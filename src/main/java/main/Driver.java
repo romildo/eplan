@@ -11,7 +11,7 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import java_cup.runtime.Symbol;
-import parse.Yylex;
+import parse.Lexer;
 import parse.sym;
 
 // command line options
@@ -79,7 +79,7 @@ public class Driver {
    }
 
    public static void lexicalAnalysis(Reader input) throws IOException {
-      Yylex lexer = new Yylex(input);
+      Lexer lexer = new Lexer(input);
       Symbol tok;
       do {
          tok = lexer.next_token();
