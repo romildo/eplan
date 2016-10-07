@@ -13,6 +13,7 @@ import com.beust.jcommander.ParameterException;
 import java_cup.runtime.Symbol;
 import parse.Lexer;
 import parse.SymbolConstants;
+import parse.sym;
 
 // command line options
 class DriverOptions {
