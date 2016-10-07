@@ -12,7 +12,7 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import java_cup.runtime.Symbol;
 import parse.Lexer;
-import parse.sym;
+import parse.SymbolConstants;
 
 // command line options
 class DriverOptions {
@@ -84,7 +84,7 @@ public class Driver {
       do {
          tok = lexer.next_token();
          System.out.println(tok);
-      } while (tok.sym != sym.EOF);
+      } while (tok.sym != SymbolConstants.EOF);
    }
 
 }
