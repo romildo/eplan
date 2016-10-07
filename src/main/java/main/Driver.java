@@ -83,7 +83,10 @@ public class Driver {
       Symbol tok;
       do {
          tok = lexer.next_token();
-         System.out.println(tok);
+         System.out.printf("%-4s %-8s %s%n",
+                           tok,
+                           SymbolConstants.terminalNames[tok.sym],
+                           tok.value == null ? "" : tok.value);
       } while (tok.sym != SymbolConstants.EOF);
    }
 
