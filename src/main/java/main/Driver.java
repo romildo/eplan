@@ -12,6 +12,7 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import java_cup.runtime.Symbol;
 import parse.Lexer;
+import parse.SymbolConstants;
 import parse.sym;
 
 // command line options
@@ -83,8 +84,12 @@ public class Driver {
       Symbol tok;
       do {
          tok = lexer.next_token();
-         System.out.println(tok);
-      } while (tok.sym != sym.EOF);
+         System.out.printf("%-9s %-4s %-8s %s%n",
+                           String.format("(%d,%d)", tok.left, tok.right),
+                           tok,
+                           SymbolConstants.terminalNames[tok.sym],
+                           tok.value == null ? "" : tok.value);
+      } while (tok.sym != SymbolConstants.EOF);
    }
 
 }

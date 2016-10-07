@@ -57,6 +57,10 @@
                   </goals>
                </execution>
             </executions>
+            <configuration>
+               <symbolsName>SymbolConstants</symbolsName>
+               <symbolsInterface>true</symbolsInterface>
+            </configuration>
          </plugin>
 
          <plugin>
