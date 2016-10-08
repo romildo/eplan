@@ -14,6 +14,8 @@ import java_cup.runtime.Symbol;
 import parse.Lexer;
 import parse.SymbolConstants;
 
+import static error.ErrorManager.em;
+
 // command line options
 class DriverOptions {
    @Parameter(description = "<source file>")
@@ -60,6 +62,8 @@ public class Driver {
          // do only lexical analyses
          if (options.lexer)
             lexicalAnalysis(input);
+
+         em.summary();
       }
       catch (IOException e) {
          System.out.println(e.getMessage());
