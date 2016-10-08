@@ -1,6 +1,8 @@
 package parse;
 
 import java_cup.runtime.Symbol;
+import java_cup.runtime.ComplexSymbolFactory.Location;
+import java_cup.runtime.ComplexSymbolFactory;
 
 %%
 
@@ -14,12 +16,26 @@ import java_cup.runtime.Symbol;
 %column
 
 %{
+   private ComplexSymbolFactory complexSymbolFactory = new ComplexSymbolFactory();
+
    // auxiliary methods to construct terminal symbols at current location
-   
-   private Symbol tok(int type, Object value) {
-      return new Symbol(type, yyline, yycolumn, value);
+
+   private Location locLeft() {
+      return new Location(yyline + 1, yycolumn + 1);
    }
-   
+
+   private Location locRight() {
+      return new Location(yyline + 1, yycolumn + 1 + yylength());
+   }
+
+   private Symbol tok(int type, String lexeme, Object value) {
+      return complexSymbolFactory.newSymbol(lexeme, type, locLeft(), locRight(), value);
+   }
+
+   private Symbol tok(int type, Object value) {
+      return tok(type, yytext(), value);
+   }
+
    private Symbol tok(int type) {
       return tok(type, null);
    }
