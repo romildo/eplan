@@ -1,6 +1,8 @@
 package parse;
 
 import java_cup.runtime.ComplexSymbolFactory.Location;
+import java_cup.runtime.ComplexSymbolFactory.ComplexSymbol;
+import java_cup.runtime.Symbol;
 
 public class Loc {
 
@@ -22,6 +24,22 @@ public class Loc {
 
    public static Loc loc(Location left, Location right) {
       return new Loc(left, right);
+   }
+
+   public static Loc loc(Symbol symbol) {
+      return loc(new Location(symbol.left, symbol.right));
+   }
+
+   public static Loc loc(Symbol a, Symbol b) {
+      return loc(new Location(a.left, b.right));
+   }
+
+   public static Loc loc(ComplexSymbol symbol) {
+      return new Loc(symbol.getLeft(), symbol.getRight());
+   }
+
+   public static Loc loc(ComplexSymbol a, ComplexSymbol b) {
+      return new Loc(a.getLeft(), b.getRight());
    }
 
    @Override
