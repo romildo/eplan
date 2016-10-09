@@ -11,8 +11,9 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import java_cup.runtime.Symbol;
-import parse.Lexer;
 import parse.SymbolConstants;
+import parse.Lexer;
+import parse.parser;
 
 import static error.ErrorManager.em;
 
@@ -25,7 +26,10 @@ class DriverOptions {
    public boolean help = false;
 
    @Parameter(names = {"--lexer"}, description = "Lexical analysis")
-   public boolean lexer = true;
+   public boolean lexer = false;
+
+   @Parameter(names = {"--parser"}, description = "Syntax analysis")
+   public boolean parser = true;
 }
 
 // main
@@ -63,11 +67,19 @@ public class Driver {
          if (options.lexer)
             lexicalAnalysis(input);
 
+         // do only lexical analyses
+         if (options.parser)
+            syntaxAnalysis(input);
+
          em.summary();
       }
       catch (IOException e) {
          System.out.println(e.getMessage());
          System.exit(2);
+      }
+      catch (Exception e) {
+         System.out.println(e.getMessage());
+         System.exit(3);
       }
       finally {
          // closes the input file
@@ -77,7 +89,7 @@ public class Driver {
             }
             catch (IOException e) {
                System.out.println(e.getMessage());
-               System.exit(3);
+               System.exit(4);
             }
       }
    }
@@ -92,6 +104,12 @@ public class Driver {
                            SymbolConstants.terminalNames[tok.sym],
                            tok.value == null ? "" : tok.value);
       } while (tok.sym != SymbolConstants.EOF);
+   }
+
+   public static void syntaxAnalysis(Reader input) throws Exception {
+      Lexer lexer = new Lexer(input);
+      parser parser = new parser(lexer);
+      parser.parse();
    }
 
 }
