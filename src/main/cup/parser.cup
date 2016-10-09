@@ -3,6 +3,7 @@ package parse;
 import error.ErrorManager;
 import java_cup.runtime.Symbol;
 import java_cup.runtime.ComplexSymbolFactory.ComplexSymbol;
+import absyn.*;
 
 parser code {:
   /* override error routines */
@@ -32,25 +33,25 @@ terminal Double LITNUM;
 terminal        PLUS, MINUS, TIMES, DIV;
 terminal        LPAREN, RPAREN;
 
-non terminal Double exp;
-non terminal Double term;
-non terminal Double factor;
+non terminal Exp exp;
+non terminal Exp term;
+non terminal Exp factor;
 
 start with exp;
 
 exp ::=
-  exp:x PLUS term:y      {: RESULT = x + y; :}
-| exp:x MINUS term:y     {: RESULT = x - y; :}
+  exp:x PLUS term:y      {: RESULT = new ExpBinOp(ExpBinOp.Op.PLUS, x, y); :}
+| exp:x MINUS term:y     {: RESULT = new ExpBinOp(ExpBinOp.Op.MINUS, x, y); :}
 | term:x                 {: RESULT = x;     :}
 ;
 
 term ::=
-| term:x TIMES factor:y  {: RESULT = x * y; :}
-| term:x DIV factor:y    {: RESULT = x / y; :}
+| term:x TIMES factor:y  {: RESULT = new ExpBinOp(ExpBinOp.Op.TIMES, x, y); :}
+| term:x DIV factor:y    {: RESULT = new ExpBinOp(ExpBinOp.Op.DIV, x, y); :}
 | factor:x               {: RESULT = x;     :}
 ;
 
 factor ::=
-  LITNUM:x               {: RESULT = x;     :}
+  LITNUM:x               {: RESULT = new ExpNum(x);     :}
 | LPAREN exp:x RPAREN    {: RESULT = x;     :}
 ;
