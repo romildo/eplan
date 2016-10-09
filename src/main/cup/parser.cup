@@ -1,6 +1,6 @@
 package parse;
 
-terminal LITINT;
+terminal LITNUM;
 terminal PLUS, MINUS, TIMES, DIV;
 terminal LPAREN, RPAREN;
 
