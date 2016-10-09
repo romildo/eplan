@@ -5,8 +5,24 @@ terminal PLUS, MINUS, TIMES, DIV;
 terminal LPAREN, RPAREN;
 
 non terminal exp;
+non terminal term;
+non terminal factor;
 
 start with exp;
 
 exp ::=
+  exp PLUS term
+| exp MINUS term
+| term
+;
+
+term ::=
+| term TIMES factor
+| term DIV factor
+| factor
+;
+
+factor ::=
+  LITNUM
+| LPAREN exp RPAREN
 ;
