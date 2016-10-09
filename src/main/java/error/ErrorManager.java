@@ -64,7 +64,7 @@ public class ErrorManager {
    }
 
    public void fatal(String format, Object... args) {
-      warningsCounter++;
+      fatalsCounter++;
       message("FATAL: " + format, args);
    }
 
@@ -82,6 +82,5 @@ public class ErrorManager {
    public void summary() {
       show.accept(getSummary());
    }
-
 
 }
