@@ -109,7 +109,8 @@ public class Driver {
    public static void syntaxAnalysis(Reader input) throws Exception {
       Lexer lexer = new Lexer(input);
       parser parser = new parser(lexer);
-      parser.parse();
+      Symbol result = parser.parse();
+      System.out.println(result.value);
    }
 
 }

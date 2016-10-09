@@ -28,29 +28,29 @@ parser code {:
   }
 :};
 
-terminal LITNUM;
-terminal PLUS, MINUS, TIMES, DIV;
-terminal LPAREN, RPAREN;
+terminal Double LITNUM;
+terminal        PLUS, MINUS, TIMES, DIV;
+terminal        LPAREN, RPAREN;
 
-non terminal exp;
-non terminal term;
-non terminal factor;
+non terminal Double exp;
+non terminal Double term;
+non terminal Double factor;
 
 start with exp;
 
 exp ::=
-  exp PLUS term
-| exp MINUS term
-| term
+  exp:x PLUS term:y      {: RESULT = x + y; :}
+| exp:x MINUS term:y     {: RESULT = x - y; :}
+| term:x                 {: RESULT = x;     :}
 ;
 
 term ::=
-| term TIMES factor
-| term DIV factor
-| factor
+| term:x TIMES factor:y  {: RESULT = x * y; :}
+| term:x DIV factor:y    {: RESULT = x / y; :}
+| factor:x               {: RESULT = x;     :}
 ;
 
 factor ::=
-  LITNUM
-| LPAREN exp RPAREN
+  LITNUM:x               {: RESULT = x;     :}
+| LPAREN exp:x RPAREN    {: RESULT = x;     :}
 ;
