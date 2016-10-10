@@ -7,10 +7,14 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
+import absyn.Exp;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import java_cup.runtime.Symbol;
+import javaslang.render.dot.DotFile;
+import javaslang.render.text.Boxes;
+import javaslang.render.text.PrettyPrinter;
 import parse.SymbolConstants;
 import parse.Lexer;
 import parse.parser;
@@ -107,10 +111,19 @@ public class Driver {
    }
 
    public static void syntaxAnalysis(Reader input) throws Exception {
-      Lexer lexer = new Lexer(input);
-      parser parser = new parser(lexer);
-      Symbol result = parser.parse();
+      final Lexer lexer = new Lexer(input);
+      final parser parser = new parser(lexer);
+      final Symbol result = parser.parse();
+      final Exp parseTree = (Exp) result.value;
       System.out.println(result.value);
+      System.out.println();
+      System.out.println("===Abstract syntax tree:===========");
+      System.out.println();
+      System.out.println(PrettyPrinter.pp(parseTree.toTree()));
+      System.out.println();
+      System.out.println(Boxes.box(parseTree.toTree()));
+      DotFile.write(parseTree.toTree(), "test1.dot");
+      System.out.println();
    }
 
 }
