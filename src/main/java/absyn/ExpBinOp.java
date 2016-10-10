@@ -1,5 +1,7 @@
 package absyn;
 
+import javaslang.collection.Tree;
+
 public class ExpBinOp extends Exp {
 
    public enum Op {PLUS, MINUS, TIMES, DIV}
@@ -14,4 +16,10 @@ public class ExpBinOp extends Exp {
       this.right = right;
    }
 
+   @Override
+   public Tree.Node<String> toTree() {
+      return Tree.of("ExpBinOp: " + op,
+                     left.toTree(),
+                     right.toTree());
+   }
 }
