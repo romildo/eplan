@@ -18,7 +18,7 @@ import static error.ErrorManager.em;
 
 public class Generator {
 
-   public static void codegen(Exp exp) {
+   public static void codegen(String name, Exp exp) {
       BytePointer error = new BytePointer((Pointer) null); // Used to retrieve messages from functions
       LLVMLinkInMCJIT();
       LLVMInitializeNativeAsmPrinter();
@@ -58,7 +58,7 @@ public class Generator {
 
       LLVMDumpModule(mod);
 
-      if (LLVMPrintModuleToFile(mod, "a.ll", error) != 0) {
+      if (LLVMPrintModuleToFile(mod, name + ".ll", error) != 0) {
          em.fatal(error.getString());
          LLVMDisposeMessage(error);
       }

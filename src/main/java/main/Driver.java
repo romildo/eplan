@@ -61,20 +61,25 @@ public class Driver {
       }
 
       Reader input = null;
+      String name = null;
       try {
          // set the input (source code) to compile
-         if (options.parameters.isEmpty())
+         if (options.parameters.isEmpty()) {
+            name = "unknown";
             input = new InputStreamReader(System.in);
-         else
-            input = new FileReader(options.parameters.get(0));
+         }
+         else {
+            name = options.parameters.get(0);
+            input = new FileReader(name);
+         }
 
          // do only lexical analyses
          if (options.lexer)
-            lexicalAnalysis(input);
+            lexicalAnalysis(name, input);
 
          // do only lexical analyses
          if (options.parser)
-            syntaxAnalysis(input);
+            syntaxAnalysis(name, input);
 
          em.summary();
       }
@@ -99,7 +104,7 @@ public class Driver {
       }
    }
 
-   public static void lexicalAnalysis(Reader input) throws IOException {
+   public static void lexicalAnalysis(String name, Reader input) throws IOException {
       Lexer lexer = new Lexer(input);
       Symbol tok;
       do {
@@ -111,7 +116,7 @@ public class Driver {
       } while (tok.sym != SymbolConstants.EOF);
    }
 
-   public static void syntaxAnalysis(Reader input) throws Exception {
+   public static void syntaxAnalysis(String name, Reader input) throws Exception {
       final Lexer lexer = new Lexer(input);
       final parser parser = new parser(lexer);
       final Symbol result = parser.parse();
@@ -125,11 +130,11 @@ public class Driver {
          System.out.println(PrettyPrinter.pp(parseTree.toTree()));
          System.out.println();
          System.out.println(Boxes.box(parseTree.toTree()));
-         DotFile.write(parseTree.toTree(), "test1.dot");
+         DotFile.write(parseTree.toTree(), name + ".dot");
          System.out.println();
          if (parseTree instanceof Exp) {
             final Exp main = (Exp) parseTree;
-            codegen.Generator.codegen(main);
+            codegen.Generator.codegen(name, main);
          }
          else
             em.fatal("internal error: program should be an expression");
