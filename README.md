@@ -22,3 +22,19 @@ analyser. JFlex can be run with the command below given on a terminal:
 $ cd src
 $ jflex lexer.jflex
 ```
+
+## Running the compiler
+
+The eplan compiler can be run with the following commands typed in the terminal:
+
+```
+$ eplan <file>.eplan
+$ llc <file>.ll
+$ clang src/main/c/bindings.c <file>.s
+$ ./a.out
+```
+
+You will be able also to run in one line:
+```
+F=<file> && ./driver -ast -dot $F && dot -O -Tpng $F.dot && llc $F.ll && clang $F.s src/main/c/bindings.c -o $F.exe && feh -Zd $F*png
+```
