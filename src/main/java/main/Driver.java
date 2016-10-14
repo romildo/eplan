@@ -7,6 +7,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
+import absyn.AST;
 import absyn.Exp;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
@@ -114,16 +115,27 @@ public class Driver {
       final Lexer lexer = new Lexer(input);
       final parser parser = new parser(lexer);
       final Symbol result = parser.parse();
-      final Exp parseTree = (Exp) result.value;
+      System.out.println("===Parsed value:===========");
       System.out.println(result.value);
       System.out.println();
-      System.out.println("===Abstract syntax tree:===========");
-      System.out.println();
-      System.out.println(PrettyPrinter.pp(parseTree.toTree()));
-      System.out.println();
-      System.out.println(Boxes.box(parseTree.toTree()));
-      DotFile.write(parseTree.toTree(), "test1.dot");
-      System.out.println();
+      if (result.value instanceof AST) {
+         final AST parseTree = (AST) result.value;
+         System.out.println("===Abstract syntax tree:===========");
+         System.out.println();
+         System.out.println(PrettyPrinter.pp(parseTree.toTree()));
+         System.out.println();
+         System.out.println(Boxes.box(parseTree.toTree()));
+         DotFile.write(parseTree.toTree(), "test1.dot");
+         System.out.println();
+         if (parseTree instanceof Exp) {
+            final Exp main = (Exp) parseTree;
+            codegen.Generator.codegen(main);
+         }
+         else
+            em.fatal("internal error: program should be an expression");
+      }
+      else
+         em.fatal("internal error: program should be an AST");
    }
 
 }
