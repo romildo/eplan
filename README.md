@@ -27,7 +27,8 @@ In order to develop the activities of the BCC328 (Compiler Construction) course 
 - [Log in](https://github.com/login) the github.
 - Visit the [EPLan](https://github.com/romildo/eplan) project page.
 - Fork the EPlan project.
-- In your computer clone your fork of the eplan project.
+![forking](images/fork.png)
+- In your computer clone your fork of the eplan project. Notice that in the commands that follow any text written between angular braces `<>` shold be replaced by an appropriate text. For instance `<working directory` should be replaced by the name of directory (folder) for working activities.
 ```
 $ cd <working directory>
 $ git clone https://github.com/romildo/eplan.git
