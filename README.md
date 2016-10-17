@@ -77,6 +77,18 @@ $ git pull upstream master
 $ git checkout -b <activity>
 ```
 - Develop the activity.
+- See the status of your cloned repository:
+```
+git status
+```
+- Add any new or modified file to the revision history:
+```
+git add <files>
+```
+- Commit the changes:
+```
+git commit -m <message>
+```
 - Push your changes to your forked project.
 ```
 git push origin <activity>
