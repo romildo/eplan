@@ -8,6 +8,9 @@ target/*
 # -- IntelliJ IDEA
 .idea
 
+# Latex build
+doc/_build
+
 # -- Emacs
 *~
 
