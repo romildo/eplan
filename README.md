@@ -145,7 +145,14 @@ $ clang -o <file>.exe src/main/c/bindings.c <file>.s
 Or if using GCC:
 
 ```
-$ gcc -o <file>.exe src/main/c/bindings.c <file>.s
+$ gcc -o <file>.exe <file>.s src/main/c/bindings.c
+```
+
+To get an image of the syntact tree of your program:
+
+```
+$ dot -O -Tpng <file>.dot <file>.dot
+$ eog <file>.dot.png
 ```
 
 Finally run the binary obtained for the eplan source code:
@@ -154,9 +161,7 @@ Finally run the binary obtained for the eplan source code:
 $ ./<file>.exe
 ```
 
-To get an image of the syntact tree of your program:
-
+These steps can be combined in a single command line:
 ```
-$ dot -O -Tpng <file>.dot <file>.dot
-$ eog <file>.dot.png
+$ F=<file> && ./driver $F && llc $F.ll && clang -o $F.exe $F.s src/main/c/bindings.c && dot -O -Tpng $F.dot && eog $F*png && ./$F.exe
 ```
