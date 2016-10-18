@@ -56,12 +56,14 @@ public class Generator {
          LLVMDisposeMessage(error);
       }
 
-      LLVMDumpModule(mod);
+      // LLVMDumpModule(mod);
 
       if (LLVMPrintModuleToFile(mod, name + ".ll", error) != 0) {
          em.fatal(error.getString());
          LLVMDisposeMessage(error);
       }
+      else
+         System.out.printf("target code written to %s.ll%n", name);
 
       LLVMDisposeBuilder(builder);
       LLVMDisposeExecutionEngine(engine);
