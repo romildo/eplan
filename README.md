@@ -19,6 +19,10 @@ compiler implementation.
 - Text editor for software development (Suggested: [Atom](https://atom.io/), [Notepad++](https://notepad-plus-plus.org/), gedit, [Emacs](https://www.gnu.org/software/emacs/))
 - IDE for Java development (optional) (suggested: [IntelliJ IDEA](https://www.jetbrains.com/idea/))
 
+## Notice about using Windows
+
+One of the library dependencies of the project (`javacpp-presets-llvm`) currently is not available for Windows, and because of that the Windows platform is not supported at the moment.
+
 ## Initial setup to work with EPlan in BCC328
 
 In order to develop the activities of the BCC328 (Compiler Construction) course you should:
@@ -128,6 +132,18 @@ Or you may use the provided shell script `driver`:
 
 ```
 $ ./driver <file>
+```
+
+The current version of the library `javacpp-presets-llvm` is based on a LLVM release that has an issue regarding floating point constants in the LLVM IR language. It follows the locale setting for numeric formatting and at the same time it does not accept a comma instead of a dot in the literal. You may have to set you locale numeric setting to `en_US-UTF-8` for it to work.
+
+```
+$ LC_NUMERIC=en_US-UTF-8 java -jar target/uber-eplan-0.1-SNAPSHOT.jar [options] [file]
+```
+
+or with the provided shell script `driver`:
+
+```
+$ LC_NUMERIC=en_US-UTF-8 ./driver <file>
 ```
 
 The generated LLVM intermediate representation code should be compiled with the `llc`:

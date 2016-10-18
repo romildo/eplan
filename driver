@@ -6,7 +6,7 @@ if [ -x nixos-version ]; then
     fi
 fi
 
-export LC_NUMERIC=en_US-UTF8
+# export LC_NUMERIC=en_US-UTF-8
 
 exec java -jar target/uber-eplan-0.1-SNAPSHOT.jar $@
 
