@@ -1,11 +1,12 @@
 # EPLan
 
-EPLan is an educational programming language for compiler construction teaching.
+EPLan is an educational programming language for compiler construction
+teaching.
 
-EPlan is used to teach compilation techniques to undergraduate
-students at Universidade Federal de Ouro. The language specification
-starts with a very minimal kernel and grows with new features as new
-techniques are learnt.
+EPlan is used to teach compilation techniques to undergraduate students
+at Universidade Federal de Ouro. The language specification starts with
+a very minimal kernel and grows with new features as new techniques are
+learnt.
 
 Tags will be used to give access to each important stage of the
 compiler implementation.
@@ -21,7 +22,9 @@ compiler implementation.
 
 ## Notice about using Windows
 
-One of the library dependencies of the project (`javacpp-presets-llvm`) currently is not available for Windows, and because of that the Windows platform is not supported at the moment.
+One of the library dependencies of the project (`javacpp-presets-llvm`)
+currently is not available for Windows, and because of that the Windows
+platform is not supported at the moment.
 
 ## Initial setup to work with EPlan in BCC328
 
@@ -134,7 +137,12 @@ Or you may use the provided shell script `driver`:
 $ ./driver <file>
 ```
 
-The current version of the library `javacpp-presets-llvm` is based on a LLVM release that has an issue regarding floating point constants in the LLVM IR language. It follows the locale setting for numeric formatting and at the same time it does not accept a comma instead of a dot in the literal. You may have to set you locale numeric setting to `en_US-UTF-8` for it to work.
+The current version of the library `javacpp-presets-llvm` is based on a
+LLVM release that has an issue regarding floating point constants in the
+LLVM IR language. It follows the locale setting for numeric formatting
+and at the same time it does not accept a comma instead of a dot in the
+literal. You may have to set you locale numeric setting to `en_US-UTF-8`
+for it to work.
 
 ```
 $ LC_NUMERIC=en_US-UTF-8 java -jar target/uber-eplan-0.1-SNAPSHOT.jar [options] [file]
