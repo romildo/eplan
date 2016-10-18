@@ -19,3 +19,8 @@ tests/*.dot*
 tests/*.exe
 tests/*.ll
 tests/*.s
+
+unknown.dot*
+unknown.exe
+unknown.ll
+unknown.s
