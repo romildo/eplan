@@ -1,10 +1,23 @@
 \input{aula}
 
-\usepackage{tcolorbox}
 \usepackage{dirtree}
 \usepackage{tikz-qtree}
 \usepackage{syntax}
 \usepackage{pygmentex}
+% \usepackage{jrmmisc}
+\usepackage{tcolorbox}
+
+
+\newenvironment{tips}{%
+  \textbf{Dicas:}\newline
+  \begin{list}{*}{%
+      \setlength{\topsep}{0pt}%
+      \setlength{\itemsep}{0pt}%
+      \setlength{\parsep}{0pt}%
+    }%
+  }{%
+  \end{list}%
+}
 
 \usetikzlibrary{
   calc,
@@ -802,7 +815,7 @@ public class ExpNum extends Exp {
 \end{frame}
 
 \begin{frame}[fragile,allowframebreaks]{A classe ExpNum}
-  \scriptsize
+  \relscale{0.78}
 \begin{pygmented}[]
 package absyn;
 
@@ -824,9 +837,7 @@ public class ExpBinOp extends Exp {
 
    @Override
    public Tree.Node<String> toTree() {
-      return Tree.of("ExpBinOp: " + op,
-                     left.toTree(),
-                     right.toTree());
+      return Tree.of("ExpBinOp: " + op, left.toTree(), right.toTree());
    }
 }
 \end{pygmented}
@@ -876,7 +887,7 @@ public class ExpNum extends Exp {
 \end{frame}
 
 \begin{frame}[fragile,allowframebreaks]{Representação intermediária de operação binária}
-  \tiny
+  \relscale{0.76}
 \begin{pygmented}[]
 package absyn;
 
@@ -885,26 +896,19 @@ import static org.bytedeco.javacpp.LLVM.*;
 import static error.ErrorManager.em;
 
 public class ExpBinOp extends Exp {
-
    // ...
 
    @Override
    public LLVMValueRef codegen(LLVMModuleRef module, LLVMBuilderRef builder) {
       final LLVMValueRef v_left = left.codegen(module, builder);
       final LLVMValueRef v_right = right.codegen(module, builder);
-
       switch (op) {
-         case PLUS:
-            return LLVMBuildFAdd(builder, v_left, v_right, "addtmp");
-         case MINUS:
-            return LLVMBuildFSub(builder, v_left, v_right, "subtmp");
-         case TIMES:
-            return LLVMBuildFMul(builder, v_left, v_right, "multmp");
-         case DIV:
-            return LLVMBuildFDiv(builder, v_left, v_right, "divtmp");
-         default:
-            em.fatal("unknown operator %s in binary operation", op);
-            return LLVMConstReal(LLVMDoubleType(), 0);
+         case PLUS:  return LLVMBuildFAdd(builder, v_left, v_right, "addtmp");
+         case MINUS: return LLVMBuildFSub(builder, v_left, v_right, "subtmp");
+         case TIMES: return LLVMBuildFMul(builder, v_left, v_right, "multmp");
+         case DIV:   return LLVMBuildFDiv(builder, v_left, v_right, "divtmp");
+         default:    em.fatal("unknown operator %s in binary operation", op);
+                     return LLVMConstReal(LLVMDoubleType(), 0);
       }
    }
 }
@@ -914,12 +918,30 @@ public class ExpBinOp extends Exp {
 
 
 \begin{frame}[fragile,allowframebreaks]{Atividade 1}
-  Tarefas:
-  \begin{enumerate}
-    \item Primeira parte: acrescentar potenciação em \lang{}.
-    \item Segunda parte: acrescentar operador unário \pyginline|-| em
-    \lang{}.
-  \end{enumerate}
+  \begin{tcolorbox}[title=Inverso aditivo]
+    Implementar a operação que calcula o inverso aditivo (ou negação)
+    à linguagem \lang{}. Será usado o operador unário prefixo
+    \pyginline|-|, com precedência maior que dos operadores
+    aritméticos binários.
+    \begin{enumerate}
+      \item Definir uma nova classe \pyginline|absyn.ExpNegate|
+      \begin{itemize}
+        \item subclasse de \pyginline|absyn.Exp|
+        \item contendo um campo correspondente ao operando da negação
+        \item implementar o método \pyginline|toTree|
+        \item implementar o método \pyginline|codegen|
+      \end{itemize}
+      \item Acrescentar uma regra de produção adequada na gramática da
+      linguagem.
+    \end{enumerate}
+
+    \begin{tips}
+      \item Use a definição \[ - x = 0 - x \]
+    \end{tips}
+\end{tcolorbox}
+
+  \framebreak
+  
   Comandos úteis:
 \begin{Verbatim}[frame=single]
 $ cd <working directory>/eplan
@@ -1206,6 +1228,16 @@ $ # faça um pull request no github
 \begin{frame}
   \begin{center}
     Fim
+
+    % \texttt{Fim}
+    
+    % \texttt{\textbf{Fim}}
+    
+    % \textbf{\texttt{Fim}}
+
+    % {This is big!}
+    
+    % {\smaller[3] This is big!}
   \end{center}
 \end{frame}
 
