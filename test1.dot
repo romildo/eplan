@@ -1,0 +1,7 @@
+digraph Tree {
+  lbl0 [label="ExpBinOp: PLUS"];
+  lbl1 [label="ExpNum: 22.0"];
+  lbl2 [label="ExpNum: 8765.0"];
+  lbl0 -> lbl1;
+  lbl0 -> lbl2;
+}
