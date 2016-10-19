@@ -46,7 +46,7 @@ exp ::=
 ;
 
 term ::=
-| term:x TIMES factor:y  {: RESULT = new ExpBinOp(ExpBinOp.Op.TIMES, x, y); :}
+  term:x TIMES factor:y  {: RESULT = new ExpBinOp(ExpBinOp.Op.TIMES, x, y); :}
 | term:x DIV factor:y    {: RESULT = new ExpBinOp(ExpBinOp.Op.DIV, x, y); :}
 | factor:x               {: RESULT = x;     :}
 ;
