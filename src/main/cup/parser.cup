@@ -53,5 +53,6 @@ term ::=
 
 factor ::=
   LITNUM:x               {: RESULT = new ExpNum(x);     :}
+| MINUS factor:x         {: RESULT = new ExpNegate(x);  :}
 | LPAREN exp:x RPAREN    {: RESULT = x;     :}
 ;
