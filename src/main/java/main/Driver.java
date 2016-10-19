@@ -120,9 +120,6 @@ public class Driver {
       final Lexer lexer = new Lexer(input);
       final parser parser = new parser(lexer);
       final Symbol result = parser.parse();
-      System.out.println("===Parsed value:===========");
-      System.out.println(result.value);
-      System.out.println();
       if (result.value instanceof AST) {
          final AST parseTree = (AST) result.value;
          System.out.println("===Abstract syntax tree:===========");
