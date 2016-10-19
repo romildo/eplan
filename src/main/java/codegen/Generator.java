@@ -28,11 +28,8 @@ public class Generator {
       LLVMModuleRef mod = LLVMModuleCreateWithName("__eplan_module");
       LLVMBuilderRef builder = LLVMCreateBuilder();
 
-      // print_double prototype
-      LLVMTypeRef[] params = {LLVMDoubleType()};
-      LLVMTypeRef funcType = LLVMFunctionType(LLVMVoidType(), new PointerPointer(params), 1, 0);
-      LLVMValueRef func = LLVMAddFunction(mod, "__eplan_print_double", funcType);
-      LLVMSetLinkage(func, LLVMExternalLinkage);
+      // default library
+      addRuntime(mod, builder);
 
       // main function generation
       LLVMTypeRef main_type = LLVMFunctionType(LLVMInt32Type(), new PointerPointer((Pointer) null), 0, 0);
@@ -40,9 +37,7 @@ public class Generator {
       LLVMBasicBlockRef entry = LLVMAppendBasicBlock(main, "entry");
       LLVMPositionBuilderAtEnd(builder, entry);
       LLVMValueRef exp_value = exp.codegen(mod, builder);
-      LLVMValueRef[] print_double_args = {exp_value};
-      LLVMValueRef print_double = LLVMGetNamedFunction(mod, "__eplan_print_double");
-      LLVMValueRef print_double_result = LLVMBuildCall(builder, print_double, new PointerPointer(print_double_args), 1, "");
+      LLVMValueRef print_double_result = addCall(mod, builder, "__eplan_print_double", exp_value);
       LLVMValueRef result = LLVMConstInt(LLVMInt32Type(), 0, 0);
       LLVMBuildRet(builder, result);
 
@@ -67,6 +62,30 @@ public class Generator {
 
       LLVMDisposeBuilder(builder);
       LLVMDisposeExecutionEngine(engine);
+   }
+
+   public static LLVMValueRef addCall(LLVMModuleRef module,
+                                      LLVMBuilderRef builder,
+                                      String function,
+                                      LLVMValueRef... args) {
+      LLVMValueRef f = LLVMGetNamedFunction(module, function);
+      return LLVMBuildCall(builder, f, new PointerPointer(args), args.length, "");
+   }
+
+   public static void addPrototype(LLVMModuleRef module,
+                                   LLVMBuilderRef builder,
+                                   String function,
+                                   LLVMTypeRef result,
+                                   LLVMTypeRef... args) {
+      LLVMTypeRef funcType = LLVMFunctionType(result, new PointerPointer(args), args.length, 0);
+      LLVMValueRef f = LLVMAddFunction(module, function, funcType);
+      LLVMSetLinkage(f, LLVMExternalLinkage);
+   }
+
+   public static void addRuntime(LLVMModuleRef module,
+                                 LLVMBuilderRef builder) {
+      addPrototype(module, builder, "__eplan_print_double", LLVMVoidType(), LLVMDoubleType());
+      addPrototype(module, builder, "llvm.pow.f64", LLVMDoubleType(), LLVMDoubleType(), LLVMDoubleType());
    }
 
 }
