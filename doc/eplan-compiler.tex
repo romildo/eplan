@@ -1,4 +1,11 @@
-\input{aula}
+\documentclass[smaller]{beamer}
+
+\usepackage{iftex}
+
+\RequireLuaTeX
+
+\usepackage[quiet]{fontspec}
+\usepackage[brazilian]{babel}
 
 \usepackage{dirtree}
 \usepackage{tikz-qtree}
@@ -6,7 +13,69 @@
 \usepackage{pygmentex}
 % \usepackage{jrmmisc}
 \usepackage{tcolorbox}
+\usepackage{relsize}
+\usepackage{indentfirst}
 
+% \setmainfont{Times New Roman}
+% \setsansfont[Scale=MatchLowercase]{Helvetica}
+% \setmonofont[Scale=MatchLowercase]{Courier}
+
+% \setmainfont{Times New Roman}
+% \setsansfont[Scale=MatchLowercase]{Helvetica LT Std}
+% \setmonofont[Scale=MatchLowercase]{Courier Std}
+
+% \setmainfont{DejaVu Serif}
+% \setsansfont[Scale=MatchLowercase]{DejaVu Sans}
+% \setmonofont[Scale=MatchLowercase]{DejaVu Sans Mono}
+
+% \setmainfont{Liberation Serif}
+% \setsansfont[Scale=MatchLowercase]{Liberation Sans}
+% \setmonofont[Scale=MatchLowercase]{Liberation Mono}
+
+% \setmainfont{Lucida Std}
+% \setsansfont[Scale=MatchLowercase]{Lucida Sans Std}
+% \setmonofont[Scale=MatchLowercase]{Lucida Sans Typewriter Std}
+% % \setmonofont[Scale=MatchLowercase]{Lucida Typewriter Std}
+
+% \setmainfont{Luxi Serif}
+% \setsansfont[Scale=MatchLowercase]{Luxi Sans}
+% \setmonofont[Scale=MatchLowercase]{Luxi Mono}
+
+% \setmainfont{Nimbus Roman No9 L}
+% \setsansfont[Scale=MatchLowercase]{Nimbus Sans L}
+% \setmonofont[Scale=MatchLowercase]{Nimbus Mono L}
+
+% \setmainfont{Droid Serif}
+% \setsansfont[Scale=MatchLowercase]{Droid Sans}
+% \setmonofont[Scale=MatchLowercase]{Droid Sans Mono}	 % no bold
+
+% \setmonofont[Scale=MatchLowercase]{Anonymous Pro}	% does not work
+% \setmonofont[Scale=MatchLowercase]{Consolas}	% does not work
+% \setmonofont[Scale=MatchLowercase]{Courier New}
+% \setmonofont[Scale=MatchLowercase]{Cousine}
+% \setmonofont[Scale=MatchLowercase]{DejaVu Sans Mono}
+% \setmonofont[Scale=MatchLowercase]{Fantasque Sans Mono}	% does not work
+% \setmonofont[Scale=MatchLowercase]{Fira Code}
+% \setmonofont[Scale=MatchLowercase]{Fira Mono}
+% \setmonofont[Scale=MatchLowercase]{FreeMono}
+% \setmonofont[Scale=MatchLowercase]{Hack}
+\setmonofont[Scale=MatchLowercase]{Input Mono Condensed}
+% \setmonofont[Scale=MatchLowercase]{Iosevka Slab}
+% \setmonofont[Scale=MatchLowercase]{Iosevka}
+% \setmonofont[Scale=MatchLowercase]{Liberation Mono}
+% \setmonofont[Scale=MatchLowercase]{Noto Mono}
+% \setmonofont[Scale=MatchLowercase]{Source Code Pro}
+% \setmonofont[Scale=MatchLowercase]{SF Mono}
+% \setmonofont[Scale=MatchLowercase]{Ubuntu Mono}	% does not work
+% % 
+% \setmonofont[Scale=MatchLowercase]{Letter Gothic Std}
+% \setmonofont[Scale=MatchLowercase]{Lucida Sans Typewriter Std}
+% \setmonofont[Scale=MatchLowercase]{Luxi Mono}
+
+
+\setbeamercovered{transparent}
+\hypersetup{colorlinks}
+\usetheme{OuroPreto}
 
 \newenvironment{tips}{%
   \textbf{Dicas:}\newline
@@ -62,16 +131,17 @@
 \renewcommand\DTstyle{\ttfamily\textcolor{red}}
 \setlength{\DTbaselineskip}{12pt}
   
-\renewcommand{\semester}{2016.2}
+\newcommand{\semester}{2016.2}
 
 \newcommand{\lang}{\textsl{EPLan}}
 
 
-\setpygmented{lang=java,tabsize=2}
-\efboxsetup{hidealllines,backgroundcolor=yellow!30}
+\setpygmented{lang=java,tabsize=3,sty=default}
+\efboxsetup{hidealllines,backgroundcolor=yellow!28}
 
 \mdfsetup{
   % backgroundcolor=green!10,
+  roundcorner=2pt,
   skipabove=2pt,
   skipbelow=2pt,
   innerleftmargin=2pt,
@@ -385,7 +455,7 @@ final String out = PrettyPrinter.pp(tree);
 \end{pygmented}
     \end{column}
     \begin{column}{.25\textwidth}
-\begin{verbatim}
+\begin{Verbatim}
 Ann
 ├──Mary
 │  ├──John
@@ -401,7 +471,7 @@ Ann
 │  └──Anthony
 └──Christopher
    └──Samuel
-\end{verbatim}
+\end{Verbatim}
     \end{column}
   \end{columns}
 \end{frame}
@@ -936,7 +1006,8 @@ public class ExpBinOp extends Exp {
     \end{enumerate}
 
     \begin{tips}
-      \item Use a definição \[ - x = 0 - x \]
+      \item Na geração de código use a função
+      \href{http://llvm.org/docs/doxygen/html/group__LLVMCCoreInstructionBuilder.html#gaf748025627b03f4f2659b006b127b758}{\pyginline|LLVMBuildNeg|}
     \end{tips}
 \end{tcolorbox}
 
