@@ -18,7 +18,7 @@ import javaslang.render.text.Boxes;
 import javaslang.render.text.PrettyPrinter;
 import parse.SymbolConstants;
 import parse.Lexer;
-import parse.parser;
+import parse.Parser;
 
 import static error.ErrorManager.em;
 
@@ -118,7 +118,7 @@ public class Driver {
 
    public static void syntaxAnalysis(String name, Reader input) throws Exception {
       final Lexer lexer = new Lexer(input);
-      final parser parser = new parser(lexer);
+      final Parser parser = new Parser(lexer);
       final Symbol result = parser.parse();
       if (result.value instanceof AST) {
          final AST parseTree = (AST) result.value;
