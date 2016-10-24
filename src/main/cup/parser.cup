@@ -65,7 +65,7 @@ term ::=
 ;
 
 factor ::=
-  LITNUM:x               {: RESULT = new ExpNum(loc(xxleft,xxright), x); :}
+  LITNUM:x               {: RESULT = new ExpReal(loc(xxleft,xxright), x); :}
 | MINUS:m factor:x       {: RESULT = new ExpNegate(loc(mxleft,xxright), x); :}
 | LPAREN exp:x RPAREN    {: RESULT = x; :}
 ;
