@@ -1,13 +1,16 @@
 package absyn;
 
 import javaslang.collection.Tree;
+import parse.Loc;
+
 import static org.bytedeco.javacpp.LLVM.*;
 
 public class ExpNegate extends Exp {
 
    public final Exp arg;
 
-   public ExpNegate(Exp arg) {
+   public ExpNegate(Loc loc, Exp arg) {
+      super(loc);
       this.arg = arg;
    }
 

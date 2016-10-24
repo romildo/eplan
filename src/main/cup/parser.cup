@@ -6,6 +6,14 @@ import java_cup.runtime.ComplexSymbolFactory.ComplexSymbol;
 import absyn.*;
 
 parser code {:
+  public Parser(Lexer lex) {
+     this(lex, lex.getSymbolFactory());
+  }
+
+  private Loc loc(Location left, Location right) {
+     return Loc.loc(left, right);
+  }
+
   /* override error routines */
   private Loc locOfInfo(Object info) {
      return info instanceof ComplexSymbol ?
@@ -33,26 +41,31 @@ terminal Double LITNUM;
 terminal        PLUS, MINUS, TIMES, DIV;
 terminal        LPAREN, RPAREN;
 
+non terminal Exp program;
 non terminal Exp exp;
 non terminal Exp term;
 non terminal Exp factor;
 
-start with exp;
+start with program;
+
+program ::=
+  exp:e                  {: RESULT = e; :}
+;
 
 exp ::=
-  exp:x PLUS term:y      {: RESULT = new ExpBinOp(ExpBinOp.Op.PLUS, x, y); :}
-| exp:x MINUS term:y     {: RESULT = new ExpBinOp(ExpBinOp.Op.MINUS, x, y); :}
-| term:x                 {: RESULT = x;     :}
+  exp:x PLUS term:y      {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.PLUS, x, y); :}
+| exp:x MINUS term:y     {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.MINUS, x, y); :}
+| term:x                 {: RESULT = x; :}
 ;
 
 term ::=
-  term:x TIMES factor:y  {: RESULT = new ExpBinOp(ExpBinOp.Op.TIMES, x, y); :}
-| term:x DIV factor:y    {: RESULT = new ExpBinOp(ExpBinOp.Op.DIV, x, y); :}
-| factor:x               {: RESULT = x;     :}
+  term:x TIMES factor:y  {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.TIMES, x, y); :}
+| term:x DIV factor:y    {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.DIV, x, y); :}
+| factor:x               {: RESULT = x; :}
 ;
 
 factor ::=
-  LITNUM:x               {: RESULT = new ExpNum(x);     :}
-| MINUS factor:x         {: RESULT = new ExpNegate(x);     :}
-| LPAREN exp:x RPAREN    {: RESULT = x;     :}
+  LITNUM:x               {: RESULT = new ExpNum(loc(xxleft,xxright), x); :}
+| MINUS:m factor:x       {: RESULT = new ExpNegate(loc(mxleft,xxright), x); :}
+| LPAREN exp:x RPAREN    {: RESULT = x; :}
 ;

@@ -89,6 +89,7 @@ public class Driver {
       }
       catch (Exception e) {
          System.out.println(e.getMessage());
+         e.printStackTrace();
          System.exit(3);
       }
       finally {
@@ -105,7 +106,7 @@ public class Driver {
    }
 
    public static void lexicalAnalysis(String name, Reader input) throws IOException {
-      Lexer lexer = new Lexer(input);
+      final Lexer lexer = new Lexer(input);
       Symbol tok;
       do {
          tok = lexer.next_token();
@@ -120,6 +121,7 @@ public class Driver {
       final Lexer lexer = new Lexer(input);
       final Parser parser = new Parser(lexer);
       final Symbol result = parser.parse();
+      //System.out.println(result);
       if (result.value instanceof AST) {
          final AST parseTree = (AST) result.value;
          System.out.println("===Abstract syntax tree:===========");

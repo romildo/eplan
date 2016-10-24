@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class ErrorManager {
+
    public static final ErrorManager em = new ErrorManager();
 
    private int errorsCounter;
@@ -18,11 +19,19 @@ public class ErrorManager {
    private Consumer<String> show;
 
    private ErrorManager() {
-      this.errorsCounter = 0;
-      this.warningsCounter = 0;
-      this.fatalsCounter = 0;
-      this.errors = new ArrayList<>();
-      this.show = System.out::println;
+      reset();
+   }
+
+   public void reset() {
+      reset(System.out::println);
+   }
+
+   public void reset(Consumer<String> show) {
+      errorsCounter = 0;
+      warningsCounter = 0;
+      fatalsCounter = 0;
+      errors = new ArrayList<>();
+      this.show = show;
    }
 
    @Override
