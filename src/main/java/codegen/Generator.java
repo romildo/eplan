@@ -4,6 +4,8 @@ import absyn.Exp;
 import org.bytedeco.javacpp.BytePointer;
 import org.bytedeco.javacpp.Pointer;
 import org.bytedeco.javacpp.PointerPointer;
+import types.REAL;
+import types.Type;
 
 import static org.bytedeco.javacpp.LLVM.*;
 import static error.ErrorManager.em;
@@ -37,7 +39,7 @@ public class Generator {
       LLVMBasicBlockRef entry = LLVMAppendBasicBlock(main, "entry");
       LLVMPositionBuilderAtEnd(builder, entry);
       LLVMValueRef exp_value = exp.codegen(mod, builder);
-      LLVMValueRef print_double_result = addCall(mod, builder, "__eplan_print_double", exp_value);
+      LLVMValueRef print_result = addPrintResult(mod, builder, exp.type, exp_value);
       LLVMValueRef result = LLVMConstInt(LLVMInt32Type(), 0, 0);
       LLVMBuildRet(builder, result);
 
@@ -86,6 +88,17 @@ public class Generator {
                                  LLVMBuilderRef builder) {
       addPrototype(module, builder, "__eplan_print_double", LLVMVoidType(), LLVMDoubleType());
       addPrototype(module, builder, "llvm.pow.f64", LLVMDoubleType(), LLVMDoubleType(), LLVMDoubleType());
+   }
+
+   public static LLVMValueRef addPrintResult(LLVMModuleRef module,
+                                             LLVMBuilderRef builder,
+                                             Type t_exp,
+                                             LLVMValueRef v_exp) {
+      if (t_exp instanceof REAL) {
+         return addCall(module, builder, "__eplan_print_double", v_exp);
+      }
+
+      return LLVMConstReal(LLVMInt32Type(), 0);
    }
 
 }

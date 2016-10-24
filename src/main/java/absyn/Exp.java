@@ -8,7 +8,7 @@ import static org.bytedeco.javacpp.LLVM.*;
 public abstract class Exp extends AST {
 
    // Type of the expression, calculated by the semantic analyser
-   Type type;
+   public Type type;
 
    public Exp(Loc loc) {
       super(loc);
