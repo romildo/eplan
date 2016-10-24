@@ -35,6 +35,24 @@ class DriverOptions {
 
    @Parameter(names = {"--parser"}, description = "Syntax analysis")
    public boolean parser = true;
+
+   @Parameter(names = {"--pp-ast"}, description = "Pretty print syntax tree")
+   public boolean pp_ast = false;
+
+   @Parameter(names = {"--pp-anotated-ast"}, description = "Pretty print annotated syntax tree")
+   public boolean pp_annotated_ast = false;
+
+   @Parameter(names = {"--box-ast"}, description = "Boxed syntax tree")
+   public boolean box_ast = false;
+
+   @Parameter(names = {"--box-annotated-ast"}, description = "Boxed annotated syntax tree")
+   public boolean box_annotated_ast = true;
+
+   @Parameter(names = {"--dot-ast"}, description = "Generate dot file of syntax tree")
+   public boolean dot_ast = false;
+
+   @Parameter(names = {"--dot-annotated-ast"}, description = "Generate dot file of annotated syntax tree")
+   public boolean dot_annotted_ast = true;
 }
 
 // main
@@ -42,8 +60,8 @@ public class Driver {
 
    public static void main(String[] args) {
       // parse command line options
-      DriverOptions options = new DriverOptions();
-      JCommander jCommander = new JCommander(options);
+      final DriverOptions options = new DriverOptions();
+      final JCommander jCommander = new JCommander(options);
       jCommander.setProgramName("Driver");
 
       try {
@@ -79,7 +97,7 @@ public class Driver {
 
          // do only lexical analyses
          if (options.parser)
-            syntaxAnalysis(name, input);
+            syntaxAnalysis(options, name, input);
 
          em.summary();
       }
@@ -117,22 +135,46 @@ public class Driver {
       } while (tok.sym != SymbolConstants.EOF);
    }
 
-   public static void syntaxAnalysis(String name, Reader input) throws Exception {
+   public static void syntaxAnalysis(DriverOptions options, String name, Reader input) throws Exception {
       final Lexer lexer = new Lexer(input, "unknown");
       final Parser parser = new Parser(lexer);
       final Symbol result = parser.parse();
       //System.out.println(result);
       if (result.value instanceof AST) {
          final AST parseTree = (AST) result.value;
-         System.out.println("===Abstract syntax tree:===========");
-         System.out.println();
-         System.out.println(PrettyPrinter.pp(parseTree.toTree()));
-         System.out.println();
-         System.out.println(Boxes.box(parseTree.toTree()));
-         DotFile.write(parseTree.toTree(), name + ".dot");
-         System.out.println();
+         if (options.pp_ast) {
+            System.out.println("===Abstract syntax tree:===========");
+            System.out.println();
+            System.out.println(PrettyPrinter.pp(parseTree.toTree()));
+            System.out.println();
+         }
+         if (options.box_ast) {
+            System.out.println("===Abstract syntax tree:===========");
+            System.out.println();
+            System.out.println(Boxes.box(parseTree.toTree()));
+            System.out.println();
+         }
+         if (options.dot_ast) {
+            DotFile.write(parseTree.toTree(), name + ".dot");
+         }
          if (parseTree instanceof Exp) {
             final Exp main = (Exp) parseTree;
+            main.semantic();
+            if (options.pp_annotated_ast) {
+               System.out.println("===Annotated abstract syntax tree:===========");
+               System.out.println();
+               System.out.println(PrettyPrinter.pp(parseTree.toTree()));
+               System.out.println();
+            }
+            if (options.box_annotated_ast) {
+               System.out.println("===Annotated abstract syntax tree:===========");
+               System.out.println();
+               System.out.println(Boxes.box(parseTree.toTree()));
+               System.out.println();
+            }
+            if (options.dot_annotted_ast) {
+               DotFile.write(parseTree.toTree(), name + ".annotated.dot");
+            }
             codegen.Generator.codegen(name, main);
          }
          else
