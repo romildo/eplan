@@ -1261,7 +1261,7 @@ public class ExpReal extends Exp {
   Implementar \textbf{literais inteiros} no compilador de \lang{}.
   \begin{enumerate}
     \item Para desenvolver esta atividade faça o \emph{checkout} da
-    \alert{versão 0.15} do projeto.
+    \alert{versão 0.16} do projeto.
     
     \item Definir uma nova classe \pyginline|types.INT| para
     representar o tipo \texttt{int} de \lang{}.
@@ -1275,6 +1275,12 @@ public class ExpReal extends Exp {
       \item implementar o método \pyginline|semantic_|
       \item implementar o método \pyginline|codegen|
     \end{itemize}
+    
+    \item Modifique a classe \pyginline|absyn.ExpBinOp| de forma que
+    os operadores aritméticos aceitem operandos inteiros e
+    reais. Neste momento não é necessário fazer conversão implícita
+    dos operandos de inteiro para real. Por hora os operandos devem
+    ser do mesmo tipo numérico.
 
     \item Acrescentar na gramática da linguagem:
     \begin{itemize}
@@ -1303,10 +1309,18 @@ public class ExpReal extends Exp {
   \end{enumerate}
 
   \begin{tips}
-    \item Na geração de código use o método
+    \item Na geração de código use os métodos
 
     \href{http://bytedeco.org/javacpp-presets/llvm/apidocs/org/bytedeco/javacpp/LLVM.html#LLVMConstInt-org.bytedeco.javacpp.LLVM.LLVMTypeRef-long-int-}{\pyginline|LLVMConstInt|}
-  \end{tips}
+
+    \href{http://bytedeco.org/javacpp-presets/llvm/apidocs/org/bytedeco/javacpp/LLVM.html#LLVMBuildAdd-org.bytedeco.javacpp.LLVM.LLVMBuilderRef-org.bytedeco.javacpp.LLVM.LLVMValueRef-org.bytedeco.javacpp.LLVM.LLVMValueRef-java.lang.String-}{\pyginline|LLVMBuildAdd|}
+
+    \href{http://bytedeco.org/javacpp-presets/llvm/apidocs/org/bytedeco/javacpp/LLVM.html#LLVMBuildSub-org.bytedeco.javacpp.LLVM.LLVMBuilderRef-org.bytedeco.javacpp.LLVM.LLVMValueRef-org.bytedeco.javacpp.LLVM.LLVMValueRef-java.lang.String-}{\pyginline|LLVMBuildSub|}
+
+    \href{http://bytedeco.org/javacpp-presets/llvm/apidocs/org/bytedeco/javacpp/LLVM.html#LLVMBuildMul-org.bytedeco.javacpp.LLVM.LLVMBuilderRef-org.bytedeco.javacpp.LLVM.LLVMValueRef-org.bytedeco.javacpp.LLVM.LLVMValueRef-java.lang.String-}{\pyginline|LLVMBuildMul|}
+
+    \href{http://bytedeco.org/javacpp-presets/llvm/apidocs/org/bytedeco/javacpp/LLVM.html#LLVMBuildSDiv-org.bytedeco.javacpp.LLVM.LLVMBuilderRef-org.bytedeco.javacpp.LLVM.LLVMValueRef-org.bytedeco.javacpp.LLVM.LLVMValueRef-java.lang.String-}{\pyginline|LLVMBuildSDiv|}
+\end{tips}
 \end{frame}
 
 
