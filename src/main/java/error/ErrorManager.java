@@ -92,4 +92,7 @@ public class ErrorManager {
       show.accept(getSummary());
    }
 
+   public boolean anyErrors() {
+      return errorsCounter + fatalsCounter > 0;
+   }
 }
