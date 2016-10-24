@@ -5,7 +5,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import parse.Loc;
 
-public abstract class AST implements ToTree<String> {
+public abstract class AST implements ToTree<String>, error.CommonErrors {
 
    // Location where the phrase was found in the source code
    protected final Loc loc;

@@ -2,6 +2,8 @@ package absyn;
 
 import javaslang.collection.Tree;
 import parse.Loc;
+import types.REAL;
+import types.Type;
 
 import static org.bytedeco.javacpp.LLVM.*;
 import static error.ErrorManager.em;
@@ -23,9 +25,20 @@ public class ExpBinOp extends Exp {
 
    @Override
    public Tree.Node<String> toTree() {
-      return Tree.of("ExpBinOp: " + op,
+      return Tree.of(annotateType("ExpBinOp: " + op),
                      left.toTree(),
                      right.toTree());
+   }
+
+   @Override
+   protected Type semantic_() {
+      final Type t_left = left.semantic();
+      final Type t_right = right.semantic();
+      if (! t_left.canBe(REAL.T))
+         typeMismatch(left.loc, t_left, REAL.T);
+      if (! t_right.canBe(REAL.T))
+         typeMismatch(right.loc, t_right, REAL.T);
+      return REAL.T;
    }
 
    @Override
