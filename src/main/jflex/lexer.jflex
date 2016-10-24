@@ -3,6 +3,7 @@ package parse;
 import static error.ErrorManager.em;
 
 import java_cup.runtime.Symbol;
+import java_cup.runtime.SymbolFactory;
 import java_cup.runtime.ComplexSymbolFactory.Location;
 import java_cup.runtime.ComplexSymbolFactory;
 
@@ -17,8 +18,16 @@ import java_cup.runtime.ComplexSymbolFactory;
 %line
 %column
 
+%eofval{
+    return tok(EOF);
+%eofval}
+
 %{
    private ComplexSymbolFactory complexSymbolFactory = new ComplexSymbolFactory();
+
+   public SymbolFactory getSymbolFactory() {
+      return complexSymbolFactory;
+   }
 
    // auxiliary methods to construct terminal symbols at current location
 

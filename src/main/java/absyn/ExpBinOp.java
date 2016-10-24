@@ -1,6 +1,7 @@
 package absyn;
 
 import javaslang.collection.Tree;
+import parse.Loc;
 
 import static org.bytedeco.javacpp.LLVM.*;
 import static error.ErrorManager.em;
@@ -13,7 +14,8 @@ public class ExpBinOp extends Exp {
    public final Exp left;
    public final Exp right;
 
-   public ExpBinOp(Op op, Exp left, Exp right) {
+   public ExpBinOp(Loc loc, Op op, Exp left, Exp right) {
+      super(loc);
       this.op = op;
       this.left = left;
       this.right = right;

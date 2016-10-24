@@ -1,6 +1,7 @@
 package absyn;
 
 import javaslang.collection.Tree;
+import parse.Loc;
 
 import static org.bytedeco.javacpp.LLVM.*;
 
@@ -8,7 +9,8 @@ public class ExpNum extends Exp {
 
    public final Double value;
 
-   public ExpNum(Double value) {
+   public ExpNum(Loc loc, Double value) {
+      super(loc);
       this.value = value;
    }
 
