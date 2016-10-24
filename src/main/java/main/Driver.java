@@ -175,7 +175,10 @@ public class Driver {
             if (options.dot_annotted_ast) {
                DotFile.write(parseTree.toTree(), name + ".annotated.dot");
             }
-            codegen.Generator.codegen(name, main);
+            if (em.anyErrors())
+               System.out.println("no code generated");
+            else
+               codegen.Generator.codegen(name, main);
          }
          else
             em.fatal("internal error: program should be an expression");
