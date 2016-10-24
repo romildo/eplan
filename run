@@ -17,7 +17,7 @@ if command -v dot >/dev/null 2>&1; then
     echo "Generating image of AST"
     echo "-------------------------------------------------"
     dot -O -Tpng $F.annotated.dot
-    if command -v eog >/dev/null 2>&1; then
+    if command -v $IMGVIEWER >/dev/null 2>&1; then
         echo "View image of AST"
         echo "-------------------------------------------------"
         $IMGVIEWER $F.annotated.dot.png &> /dev/null
