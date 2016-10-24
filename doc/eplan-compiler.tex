@@ -53,13 +53,13 @@
 % \setmonofont[Scale=MatchLowercase]{Consolas}	% does not work
 % \setmonofont[Scale=MatchLowercase]{Courier New}
 % \setmonofont[Scale=MatchLowercase]{Cousine}
-% \setmonofont[Scale=MatchLowercase]{DejaVu Sans Mono}
+\setmonofont[Scale=MatchLowercase]{DejaVu Sans Mono}
 % \setmonofont[Scale=MatchLowercase]{Fantasque Sans Mono}	% does not work
 % \setmonofont[Scale=MatchLowercase]{Fira Code}
 % \setmonofont[Scale=MatchLowercase]{Fira Mono}
 % \setmonofont[Scale=MatchLowercase]{FreeMono}
 % \setmonofont[Scale=MatchLowercase]{Hack}
-\setmonofont[Scale=MatchLowercase]{Input Mono Condensed}
+% \setmonofont[Scale=MatchLowercase]{Input Mono Condensed}
 % \setmonofont[Scale=MatchLowercase]{Iosevka Slab}
 % \setmonofont[Scale=MatchLowercase]{Iosevka}
 % \setmonofont[Scale=MatchLowercase]{Liberation Mono}
@@ -1006,8 +1006,11 @@ public class ExpBinOp extends Exp {
     \end{enumerate}
 
     \begin{tips}
-      \item Na geração de código use a função
-      \href{http://llvm.org/docs/doxygen/html/group__LLVMCCoreInstructionBuilder.html#gaf748025627b03f4f2659b006b127b758}{\pyginline|LLVMBuildNeg|}
+      \item Na geração de código use o método
+
+      \href{http://bytedeco.org/javacpp-presets/llvm/apidocs/org/bytedeco/javacpp/LLVM.html#LLVMBuildFNeg-org.bytedeco.javacpp.LLVM.LLVMBuilderRef-org.bytedeco.javacpp.LLVM.LLVMValueRef-java.lang.String-}{\pyginline|LLVMBuildFNeg|}
+
+      \href{http://llvm.org/docs/doxygen/html/group__LLVMCCoreInstructionBuilder.html#gaf748025627b03f4f2659b006b127b758}{\pyginline|LLVMBuildFNeg|}
     \end{tips}
 \end{tcolorbox}
 
@@ -1029,6 +1032,282 @@ $ # faça um pull request no github
 \end{Verbatim}
 \end{frame}
 
+
+\section{Análise semântica}
+
+\begin{frame}[fragile,allowframebreaks]{Anotando a localização na árvore sintática}
+  \begin{itemize}
+    \item Na análise semêntica os erros encontrados devem ser
+    reportados.
+
+    \item Deve-se indicar a localização do erro no código fonte.
+
+    \item Por isto a árvore sintática deve conter a
+    \textbf{localização}.
+
+    \item O atributo \pyginline|loc| foi adicionado à classe abstrata
+    \pyginline|absyn.AST|.
+\begin{pygmented}[]
+import parse.Loc;
+
+public abstract class AST implements ToTree<String> {
+
+   // Location where the phrase was found in the source code
+   protected final Loc loc;
+
+   public AST(Loc loc) {
+      this.loc = loc;
+   }
+
+   // ...
+}
+\end{pygmented}
+
+    \framebreak
+    
+    \item Um argumento correspondente foi adicionado aos construtores
+    das subclasses de \pyginline|absyn.AST|. Por exemplo:
+\begin{pygmented}[]
+public class ExpReal extends Exp {
+
+   public final Double value;
+
+   public ExpReal(Loc loc, Double value) {
+      super(loc);
+      this.value = value;
+   }
+
+   // ...
+}
+\end{pygmented}
+
+    \framebreak
+
+    \item A criação das árvores sintáticas nas ações semânticas do
+    analisador sintático deve informar a localização. Exemplo:
+\begin{pygmented}[]
+factor ::=
+  LITNUM:x {: RESULT = new ExpReal(loc(xxleft,xxright), x); :}
+;
+\end{pygmented}
+
+    \item Na regra de produção, ao indicarmos o nome do valor
+    semântico de um símbolo, são criadas três variáveis no analisador
+    gerado pelo CUP, contendo as seguintes informações:
+    \begin{itemize}
+      \item valor semântico do símbolo
+      \item posição onde o símbolo começou no código fonte
+      \item posição onde o símbolo terminou no código fonte
+    \end{itemize}
+    No exemplo estas variáveis são respectivamente \pyginline|x|,
+    \pyginline|xxleft|, e \pyginline|xxright|.
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile,allowframebreaks]{Representando os tipos da linguagem}
+  \begin{itemize}
+    \item O pacote \pyginline|type| contém classes usadas para representar
+    os tipos da linguagem sendo compilada.
+    \item A representação geral é \pyginline|Type|.
+    \item \pyginline|Type| é uma classe abstrata, com subclasses concretas
+    para representar cada uma das possibiliades:
+    \begin{center}
+      \small
+      \begin{tabular}{lll} \hline
+        \textbf{descrição}   & \textbf{classe}    & \textbf{objeto}                                          \\\hline
+        \texttt{bool}        & \pyginline|BOOL|   & \pyginline|BOOL.T|                                       \\
+        \texttt{int}         & \pyginline|INT|    & \pyginline|INT.T|                                        \\
+        \texttt{real}        & \pyginline|REAL|   & \pyginline|REAL.T|                                       \\
+        \texttt{char}        & \pyginline|CHAR|   & \pyginline|CHAR.T|                                       \\
+        \texttt{string}      & \pyginline|STRING| & \pyginline|STRING.T|                                     \\
+        \emph{array}         & \pyginline|ARRAY|  & \pyginline|new Array(Type element)|                      \\
+        \emph{registro}      & \pyginline|RECORD| & \pyginline|new RECORD(List<Tuple2<Symbol,Type>> fields)| \\
+        \emph{registro nulo} & \pyginline|NIL|    & \pyginline|NIL.T|                                        \\
+        \texttt{unit}        & \pyginline|UNIT|   & \pyginline|UNIT.T|                                       \\
+        \emph{nome}          & \pyginline|NAME|   & \pyginline|new Name(Symbol name, Type binding)|          \\\hline
+      \end{tabular}
+    \end{center}
+  \end{itemize}    
+\end{frame}
+
+\begin{frame}[fragile,allowframebreaks]{Algumas operações com tipos}
+  \begin{description}
+    \item[\pyginline|Type actual()|]\mbox{}\newline
+    \begin{itemize}
+      \item Retorna a representação que é de fato usada para o tipo.
+      \item É o próprio objeto, exceto para a classe \pyginline|NAME|, onde
+      é retornado \pyginline|binding.actual()|.
+    \end{itemize}
+    \framebreak
+    
+    \item[\pyginline|boolean canBe(Type type)|]\mbox{}\newline
+    \begin{itemize}
+      \item Verifica se o tipo que recebe a mensagem é compatível (é igual
+      ou pode ser convertido para) o tipo dado como argumento.
+      \item Retorna \pyginline|true| somente se os dois tipos forem
+      idênticos, exceto nos seguintes casos:
+      \begin{itemize}
+        \item o tipo do registo nulo (\texttt{nil}), \pyginline|NIL|, é
+        compatível com \pyginline|NIL| e com qualquer tipo registro,
+        \item um tipo \pyginline|NAME| é compatível com algum tipo, se
+        e somente se o seu atributo \pyginline|binding| for compatível
+        com o tipo.
+      \end{itemize}
+    \end{itemize}
+    \framebreak
+
+    \item[\pyginline|boolean canBe(Type... types)|]\mbox{}\newline
+    \begin{itemize}
+      \item Verifica a compatibilidade com algum dos tipos dados como
+      argumentos.
+    \end{itemize}
+  \end{description}
+\end{frame}
+
+
+\begin{frame}[fragile,allowframebreaks]{Reportando erros comuns}
+  \begin{itemize}
+    \item A interface \pyginline|error.CommonErrors| define alguns
+    métodos para reportar erros comumente encontrados pelo compilador.
+
+    \item Um dos erros mais comuns é a inconsistência de tipos.
+\begin{pygmented}[]
+public interface CommonErrors {
+
+   default void typeMismatch(Loc loc, Type found, Type... expected) {
+      // ...
+   }
+
+   // ...
+}
+\end{pygmented}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile,allowframebreaks]{Análise semântica}
+  \begin{itemize}
+    \item O analisador semântico
+    \begin{itemize}
+      \item verifica a consistência do programa
+      \item calcula o tipo das expressões
+    \end{itemize}
+    \item Expressões tem um atributo \pyginline|type| cujo valor é a
+    representação do tipo obtido para a expressão.
+    \item \pyginline|type| é calculado pelo analisador semântico.
+\begin{pygmented}[]
+import types.Type;
+
+public abstract class Exp extends AST {
+
+   // Type of the expression, calculated by the semantic analyser
+   public Type type;
+
+   // Obtain the type of the expression as a string prefixed by the given text.
+   protected String annotateType(String text) {
+      final String theType = type == null ? "" : "\n<" + type + ">";
+      return text + theType;
+   }
+
+   // ...
+}
+\end{pygmented}
+
+    \framebreak
+    
+    \item O método \pyginline|semantic| da classe
+    \pyginline|absyn.Exp| faz análise semântica da expressão.
+    \begin{itemize}
+      \item Usa o método auxiliar \pyginline|semantic_| para fazer a
+      análise semântica de fato, obtendo o tipo da expressão.
+      \item Coloca o tipo encontrado no atributo \pyginline|type|.
+    \end{itemize}
+\begin{pygmented}[]
+public abstract class Exp extends AST {
+   // ...
+
+   // Do semantic analysis of the expression
+   public Type semantic() {
+      type = semantic_();
+      return type;
+   }
+
+   // Type check the expression. Should be defined in the concrete subclasses.
+   protected abstract Type semantic_();
+}
+\end{pygmented}
+    
+    \item Subclasses de \pyginline|absyn.Exp| devem definir o método
+    \pyginline|semantic_| apropriadamente.
+    
+    \item Por exemplo:
+\begin{pygmented}[]
+public class ExpReal extends Exp {
+   // ...
+
+   @Override
+   protected Type semantic_() {
+      return REAL.T;
+   }
+}
+\end{pygmented}
+
+  \end{itemize}
+\end{frame}
+
+
+
+\begin{frame}[fragile,allowframebreaks]{Atividade 2: literal inteiro}
+  Implementar \textbf{literais inteiros} no compilador de \lang{}.
+  \begin{enumerate}
+    \item Para desenvolver esta atividade faça o \emph{checkout} da
+    \alert{versão 0.15} do projeto.
+    
+    \item Definir uma nova classe \pyginline|types.INT| para
+    representar o tipo \texttt{int} de \lang{}.
+
+    \item Definir uma nova classe \pyginline|absyn.ExpInt| para
+    representar as árvores sintáticas das constantes inteiras:
+    \begin{itemize}
+      \item subclasse de \pyginline|absyn.Exp|
+      \item contendo um campo correspondente ao valor da constante
+      \item implementar o método \pyginline|toTree|
+      \item implementar o método \pyginline|semantic_|
+      \item implementar o método \pyginline|codegen|
+    \end{itemize}
+
+    \item Acrescentar na gramática da linguagem:
+    \begin{itemize}
+      \item o símbolo terminal \pyginline|LITINT|
+      \item uma regra de produção adequada
+    \end{itemize}
+
+    \item Na especificação léxica da linguagem
+    \begin{itemize}
+      \item acrescentar uma regra para o literal inteiro:
+
+      Um literal inteiro é uma sequência não vazia de dígitos
+      decimais.
+
+      \item modificar a regra do literal real para não casar com
+      literais inteiros
+    \end{itemize}
+
+    \item Definir a função \pyginline|__eplan_print_int| (em C) na
+    biblioteca padrão de \lang{} para exibir um valor inteiro.
+
+    \item Modificar o método \pyginline|addPrintResult| na classe
+    \pyginline|codegen.Generator| para considerar o caso de valores
+    inteiros. Este método gera código para exibir o valor de uma
+    expressão na saída padrão.
+  \end{enumerate}
+
+  \begin{tips}
+    \item Na geração de código use o método
+
+    \href{http://bytedeco.org/javacpp-presets/llvm/apidocs/org/bytedeco/javacpp/LLVM.html#LLVMConstInt-org.bytedeco.javacpp.LLVM.LLVMTypeRef-long-int-}{\pyginline|LLVMConstInt|}
+  \end{tips}
+\end{frame}
 
 
 
@@ -1091,32 +1370,6 @@ $ # faça um pull request no github
 % \end{frame}
 
 
-% \begin{frame}[fragile,allowframebreaks]{Representando os tipos da linguagem}
-%   \begin{itemize}
-%     \item O pacote \pyginline|type| contém classes usadas para representar
-%     os tipos da linguagem sendo compilada.
-%     \item O tipo principal é \pyginline|Type|.
-%     \item \pyginline|Type| é uma classe abstrata, com subclasses concretas
-%     para representar cada uma das possibiliades:
-%     \begin{center}
-%       \small
-%       \begin{tabular}{lll} \hline
-%         \textbf{descrição}   & \textbf{classe}    & \textbf{objeto}                                          \\\hline
-%         \texttt{bool}        & \pyginline|BOOL|   & \pyginline|BOOL.T|                                       \\
-%         \texttt{int}         & \pyginline|INT|    & \pyginline|INT.T|                                        \\
-%         \texttt{real}        & \pyginline|REAL|   & \pyginline|REAL.T|                                       \\
-%         \texttt{char}        & \pyginline|CHAR|   & \pyginline|CHAR.T|                                       \\
-%         \texttt{string}      & \pyginline|STRING| & \pyginline|STRING.T|                                     \\
-%         \emph{array}         & \pyginline|ARRAY|  & \pyginline|new Array(Type element)|                      \\
-%         \emph{registro}      & \pyginline|RECORD| & \pyginline|new RECORD(List<Tuple2<Symbol,Type>> fields)| \\
-%         \emph{registro nulo} & \pyginline|NIL|    & \pyginline|NIL.T|                                        \\
-%         \texttt{unit}        & \pyginline|UNIT|   & \pyginline|UNIT.T|                                       \\
-%         \emph{nome}          & \pyginline|NAME|   & \pyginline|new Name(Symbol name, Type binding)|          \\\hline
-%       \end{tabular}
-%     \end{center}
-%   \end{itemize}    
-% \end{frame}
-
 % \begin{frame}[fragile,allowframebreaks]{O problema dos tipos mutuamente recursivos}
 %   \begin{itemize}
 %     \item A classe \pyginline|NAME| é usada na compilação de tipos
@@ -1142,40 +1395,6 @@ $ # faça um pull request no github
 %       atributo \pyginline|binding| deste objeto.
 %     \end{itemize}
 %   \end{itemize}
-% \end{frame}
-
-
-% \begin{frame}[fragile,allowframebreaks]{Algumas operações com tipos}
-%   \begin{description}
-%     \item[\pyginline|Type actual()|]\mbox{}\newline
-%     \begin{itemize}
-%       \item Retorna a representação que é de fato usada para o tipo.
-%       \item É o próprio objeto, exceto para a classe \pyginline|NAME|, onde
-%       é retornado \pyginline|binding.actual()|.
-%     \end{itemize}
-%     \framebreak
-    
-%     \item[\pyginline|boolean coerceTo(Type type)|]\mbox{}\newline
-%     \begin{itemize}
-%       \item Verifica se o tipo que recebe a mensagem é compatível (é igual
-%       ou pode ser convertido para) o tipo dado como argumento.
-%       \item Retorna \pyginline|true| somente se os dois tipos forem
-%       idênticos, exceto nos seguintes casos:
-%       \begin{itemize}
-%         \item o tipo do registo nulo (\texttt{nil}), \pyginline|NIL|, é
-%         compatível com \pyginline|NIL| e com qualquer tipo registro,
-%         \item um tipo \pyginline|NAME| é compatível com algum tipo, sse o
-%         seu atributo \pyginline|binding| for compatível com o tipo.
-%       \end{itemize}
-%     \end{itemize}
-%     \framebreak
-
-%     \item[\pyginline|boolean coerceTo(Type... types)|]\mbox{}\newline
-%     \begin{itemize}
-%       \item Verifica a compatibilidade com algum dos tipos dados como
-%       argumento.
-%     \end{itemize}
-%   \end{description}
 % \end{frame}
 
 
