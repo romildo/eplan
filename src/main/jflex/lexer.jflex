@@ -22,7 +22,15 @@ import java_cup.runtime.ComplexSymbolFactory;
     return tok(EOF);
 %eofval}
 
+%ctorarg String unitName
+
+%init{
+   this.unit = unitName;
+%init}
+
 %{
+   private String unit;
+
    private ComplexSymbolFactory complexSymbolFactory = new ComplexSymbolFactory();
 
    public SymbolFactory getSymbolFactory() {
@@ -32,11 +40,11 @@ import java_cup.runtime.ComplexSymbolFactory;
    // auxiliary methods to construct terminal symbols at current location
 
    private Location locLeft() {
-      return new Location(yyline + 1, yycolumn + 1);
+      return new Location(unit, yyline + 1, yycolumn + 1);
    }
 
    private Location locRight() {
-      return new Location(yyline + 1, yycolumn + 1 + yylength());
+      return new Location(unit, yyline + 1, yycolumn + 1 + yylength());
    }
 
    private Symbol tok(int type, String lexeme, Object value) {
