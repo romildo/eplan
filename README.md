@@ -41,9 +41,9 @@ $ cd <working directory>
 $ git clone https://github.com/romildo/eplan.git
 $ cd eplan
 ```
-- Set the remote repository for your clone.
+- Set the remote repository for your clone
 ```
-$ git remote add upstream https://github.com/romildo/eplan
+$ git remote add upstream https://github.com/romildo/eplan.git
 $ git remote -v
 ```
 
@@ -125,7 +125,14 @@ $ mvn package
 
 ### To run the eplan compiler
 
-Run the eplan compiler:
+The EPlan compiler accepts some command line options. A summary of its
+usage can be obtained with the `--help` option:
+
+```
+$ java -jar target/uber-eplan-0.1-SNAPSHOT.jar --help
+```
+
+Run the EPLan compiler with the command line:
 
 ```
 $ java -jar target/uber-eplan-0.1-SNAPSHOT.jar [options] [file]
@@ -135,6 +142,15 @@ Or you may use the provided shell script `driver`:
 
 ```
 $ ./driver <file>
+```
+
+There is also the `run` script, which runs the compiler on the standard
+input, and generates and runs the executable. It also shows the image of
+the abstract syntax tree. For that the
+[Graphviz](http://www.graphviz.org/) package is needed.
+
+```
+$ ./run
 ```
 
 The current version of the library `javacpp-presets-llvm` is based on a
@@ -154,7 +170,11 @@ or with the provided shell script `driver`:
 $ LC_NUMERIC=en_US-UTF-8 ./driver <file>
 ```
 
-The generated LLVM intermediate representation code should be compiled with the `llc`:
+A better alternative may be setting your language to `en_US-UTF-8` in
+the system configuration.
+
+The generated LLVM intermediate representation code should be compiled
+with the `llc`:
 
 ```
 $ llc <file>.ll
