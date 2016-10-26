@@ -7,7 +7,7 @@ if command -v which >/dev/null 2>&1; then
     rlwrap ./driver --box-annotated-ast --dot-annotated-ast $@
 else
     ./driver $@
-fi
+fi || exit $?
 
 echo "Object code (LLVM IR)"
 echo "-------------------------------------------------"
