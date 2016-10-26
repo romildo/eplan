@@ -30,7 +30,7 @@ public class ExpNegate extends Exp {
    @Override
    protected Type semantic_() {
       final Type t_arg = arg.semantic();
-      if (! t_arg.canBe(REAL.T))
+      if (! t_arg.is(REAL.T))
          typeMismatch(arg.loc, t_arg, REAL.T);
       return REAL.T;
    }
