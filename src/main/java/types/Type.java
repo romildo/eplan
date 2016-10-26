@@ -22,12 +22,12 @@ public abstract class Type implements ToTree<String> {
    // Verify if this type can be coerced to the given type. In
    // general one type can be coerced to another type if and only if the
    // types are the same.
-   public boolean canBe(Type type) {
+   public boolean is(Type type) {
       return type == this;
    }
 
    // Verify if this type can be coerced to any of the given types.
-   public boolean coerceTo(Type... types) {
-      return List.of(types).exists(t -> this.canBe(t));
+   public boolean is(Type... types) {
+      return List.of(types).exists(t -> this.is(t));
    }
 }
