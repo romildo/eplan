@@ -64,7 +64,7 @@ import java_cup.runtime.ComplexSymbolFactory;
 
 [ \t\f\n\r]+         { /* skip */ }
 
-[0-9]+ ("." [0-9]+)? { return tok(LITREAL, new Double(yytext())); }
+[0-9]+ ("." [0-9]+)? { return tok(LITREAL, yytext()); }
 
 "+"                  { return tok(PLUS); }
 "-"                  { return tok(MINUS); }
