@@ -6,7 +6,8 @@ import types.REAL;
 import types.Type;
 
 import static org.bytedeco.javacpp.LLVM.*;
-import static error.ErrorManager.em;
+import static error.ErrorHelper.fatal;
+import static semantic.SemanticHelper.*;
 
 public class ExpBinOp extends Exp {
 
@@ -33,9 +34,9 @@ public class ExpBinOp extends Exp {
       final Type t_left = left.semantic();
       final Type t_right = right.semantic();
       if (! t_left.is(REAL.T))
-         typeMismatch(left.loc, t_left, REAL.T);
+         throw typeMismatch(left.loc, t_left, REAL.T);
       if (! t_right.is(REAL.T))
-         typeMismatch(right.loc, t_right, REAL.T);
+         throw typeMismatch(right.loc, t_right, REAL.T);
       return REAL.T;
    }
 
@@ -54,8 +55,7 @@ public class ExpBinOp extends Exp {
          case DIV:
             return LLVMBuildFDiv(builder, v_left, v_right, "divtmp");
          default:
-            em.fatal("unknown operator %s in binary operation", op);
-            return LLVMConstReal(LLVMDoubleType(), 0);
+            throw fatal("unknown operator %s in binary operation", op);
       }
    }
 }

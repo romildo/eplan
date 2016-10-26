@@ -6,6 +6,7 @@ import types.REAL;
 import types.Type;
 
 import static org.bytedeco.javacpp.LLVM.*;
+import static semantic.SemanticHelper.*;
 
 public class ExpNegate extends Exp {
 
@@ -25,7 +26,7 @@ public class ExpNegate extends Exp {
    protected Type semantic_() {
       final Type t_arg = arg.semantic();
       if (! t_arg.is(REAL.T))
-         typeMismatch(arg.loc, t_arg, REAL.T);
+         throw typeMismatch(arg.loc, t_arg, REAL.T);
       return REAL.T;
    }
 

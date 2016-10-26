@@ -12,6 +12,7 @@ import absyn.Exp;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
+import error.CompilerError;
 import java_cup.runtime.Symbol;
 import javaslang.render.dot.DotFile;
 import javaslang.render.text.Boxes;
@@ -20,7 +21,7 @@ import parse.SymbolConstants;
 import parse.Lexer;
 import parse.Parser;
 
-import static error.ErrorManager.em;
+import static error.ErrorHelper.fatal;
 
 // command line options
 class DriverOptions {
@@ -98,8 +99,10 @@ public class Driver {
          // do only lexical analyses
          if (options.parser)
             syntaxAnalysis(options, name, input);
-
-         em.summary();
+      }
+      catch (CompilerError e) {
+         System.out.println(e.getMessage());
+         System.exit(3);
       }
       catch (IOException e) {
          System.out.println(e.getMessage());
@@ -140,51 +143,49 @@ public class Driver {
       final Parser parser = new Parser(lexer);
       final Symbol result = parser.parse();
       //System.out.println(result);
-      if (result.value instanceof AST) {
-         final AST parseTree = (AST) result.value;
-         if (options.pp_ast) {
-            System.out.println("===Abstract syntax tree:===========");
-            System.out.println();
-            System.out.println(PrettyPrinter.pp(parseTree.toTree()));
-            System.out.println();
-         }
-         if (options.box_ast) {
-            System.out.println("===Abstract syntax tree:===========");
-            System.out.println();
-            System.out.println(Boxes.box(parseTree.toTree()));
-            System.out.println();
-         }
-         if (options.dot_ast) {
-            DotFile.write(parseTree.toTree(), name + ".dot");
-         }
-         if (parseTree instanceof Exp) {
-            final Exp main = (Exp) parseTree;
-            main.semantic();
-            if (options.pp_annotated_ast) {
-               System.out.println("===Annotated abstract syntax tree:===========");
-               System.out.println();
-               System.out.println(PrettyPrinter.pp(parseTree.toTree()));
-               System.out.println();
-            }
-            if (options.box_annotated_ast) {
-               System.out.println("===Annotated abstract syntax tree:===========");
-               System.out.println();
-               System.out.println(Boxes.box(parseTree.toTree()));
-               System.out.println();
-            }
-            if (options.dot_annotted_ast) {
-               DotFile.write(parseTree.toTree(), name + ".annotated.dot");
-            }
-            if (em.anyErrors())
-               System.out.println("no code generated");
-            else
-               codegen.Generator.codegen(name, main);
-         }
-         else
-            em.fatal("internal error: program should be an expression");
+
+      if (!(result.value instanceof AST))
+         throw fatal("internal error: program should be an AST");
+
+      final AST parseTree = (AST) result.value;
+      if (options.pp_ast) {
+         System.out.println("===Abstract syntax tree:===========");
+         System.out.println();
+         System.out.println(PrettyPrinter.pp(parseTree.toTree()));
+         System.out.println();
       }
-      else
-         em.fatal("internal error: program should be an AST");
+      if (options.box_ast) {
+         System.out.println("===Abstract syntax tree:===========");
+         System.out.println();
+         System.out.println(Boxes.box(parseTree.toTree()));
+         System.out.println();
+      }
+      if (options.dot_ast) {
+         DotFile.write(parseTree.toTree(), name + ".dot");
+      }
+
+      if (!(parseTree instanceof Exp))
+         throw fatal("internal error: program should be an expression");
+
+      final Exp main = (Exp) parseTree;
+      main.semantic();
+      if (options.pp_annotated_ast) {
+         System.out.println("===Annotated abstract syntax tree:===========");
+         System.out.println();
+         System.out.println(PrettyPrinter.pp(parseTree.toTree()));
+         System.out.println();
+      }
+      if (options.box_annotated_ast) {
+         System.out.println("===Annotated abstract syntax tree:===========");
+         System.out.println();
+         System.out.println(Boxes.box(parseTree.toTree()));
+         System.out.println();
+      }
+      if (options.dot_annotted_ast) {
+         DotFile.write(parseTree.toTree(), name + ".annotated.dot");
+      }
+
+      codegen.Generator.codegen(name, main);
    }
 
 }

@@ -19,8 +19,7 @@ import java.io.StringReader;
 import javax.swing.*;
 import javax.swing.tree.DefaultTreeModel;
 
-import static error.ErrorManager.em;
-
+import error.CompilerError;
 import java_cup.runtime.Symbol;
 import javaslang.render.dot.DotFile;
 import parse.Lexer;
@@ -217,7 +216,6 @@ public class SemantGui extends JFrame implements ActionListener {
    }
 
    private void compileProgram() {
-      em.reset(logArea::append);
       StringReader file = new StringReader(programArea.getText());
       Lexer scanner = new Lexer(file, fileField.getText());
       Parser parser = new Parser(scanner, scanner.getSymbolFactory());
@@ -231,13 +229,15 @@ public class SemantGui extends JFrame implements ActionListener {
             tree.expandRow(row);
          types.Type et = exp.semantic();
          logArea.append("===> " + et.toString() + "\n");
-         logArea.append(em.getSummary());
+      }
+      catch (CompilerError e) {
+         logArea.append(e.getMessage());
       }
       catch (Exception e) {
-         // e.printStackTrace();
          JOptionPane.showMessageDialog(SemantGui.this,
                                        "Error compiling program\n",
-                                       "Internal error compiling program",
+                                       "Internal error compiling program\n" +
+                                       e.getStackTrace(),
                                        JOptionPane.ERROR_MESSAGE);
       }
 
@@ -268,7 +268,11 @@ public class SemantGui extends JFrame implements ActionListener {
             dialog.setVisible(true);
          }
          catch (Exception e) {
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(SemantGui.this,
+                                          "Error creating asy graph\n",
+                                          "Cannot create asy graph\n" +
+                                          e.getStackTrace(),
+                                          JOptionPane.ERROR_MESSAGE);
          }
    }
 }
