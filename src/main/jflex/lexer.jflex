@@ -70,6 +70,7 @@ litreal   = {litint} | {litfloat1} | {litfloat2} | {litfloat3}
 
 [ \t\f\n\r]+         { /* skip */ }
 
+{litint}             { return tok(LITINT, yytext()); }
 {litreal}            { return tok(LITREAL, yytext()); }
 
 "+"                  { return tok(PLUS); }
