@@ -38,7 +38,7 @@ public class Generator {
       LLVMValueRef main = LLVMAddFunction(mod, "main", main_type);
       LLVMBasicBlockRef entry = LLVMAppendBasicBlock(main, "entry");
       LLVMPositionBuilderAtEnd(builder, entry);
-      LLVMValueRef exp_value = exp.codegen(mod, builder);
+      LLVMValueRef exp_value = exp.translate(mod, builder);
       LLVMValueRef print_result = addPrintResult(mod, builder, exp.type, exp_value);
       LLVMValueRef result = LLVMConstInt(LLVMInt32Type(), 0, 0);
       LLVMBuildRet(builder, result);

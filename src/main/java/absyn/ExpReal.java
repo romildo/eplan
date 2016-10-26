@@ -27,7 +27,7 @@ public class ExpReal extends Exp {
    }
 
    @Override
-   public LLVMValueRef codegen(LLVMModuleRef module, LLVMBuilderRef builder) {
+   public LLVMValueRef translate(LLVMModuleRef module, LLVMBuilderRef builder) {
       return LLVMConstReal(LLVMDoubleType(), value);
    }
 }

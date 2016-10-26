@@ -30,6 +30,6 @@ public abstract class Exp extends AST {
    protected abstract Type semantic_();
 
    // Generate code for the LLVM IR (intermediate representation)
-   public abstract LLVMValueRef codegen(LLVMModuleRef module, LLVMBuilderRef builder);
+   public abstract LLVMValueRef translate(LLVMModuleRef module, LLVMBuilderRef builder);
 
 }
