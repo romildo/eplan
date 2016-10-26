@@ -37,7 +37,7 @@ parser code {:
   }
 :};
 
-terminal Double LITNUM;
+terminal Double LITREAL;
 terminal        PLUS, MINUS, TIMES, DIV;
 terminal        LPAREN, RPAREN;
 
@@ -65,7 +65,7 @@ term ::=
 ;
 
 factor ::=
-  LITNUM:x               {: RESULT = new ExpReal(loc(xxleft,xxright), x); :}
+  LITREAL:x              {: RESULT = new ExpReal(loc(xxleft,xxright), x); :}
 | MINUS:m factor:x       {: RESULT = new ExpNegate(loc(mxleft,xxright), x); :}
 | LPAREN exp:x RPAREN    {: RESULT = x; :}
 ;
