@@ -22,16 +22,17 @@ public class ExpNegate extends Exp {
    }
 
    @Override
-   public LLVMValueRef codegen(LLVMModuleRef module, LLVMBuilderRef builder) {
-      final LLVMValueRef v_arg = arg.codegen(module, builder);
-      return LLVMBuildFNeg(builder, v_arg, "negtmp");
-   }
-
-   @Override
    protected Type semantic_() {
       final Type t_arg = arg.semantic();
       if (! t_arg.is(REAL.T))
          typeMismatch(arg.loc, t_arg, REAL.T);
       return REAL.T;
    }
+
+   @Override
+   public LLVMValueRef translate(LLVMModuleRef module, LLVMBuilderRef builder) {
+      final LLVMValueRef v_arg = arg.translate(module, builder);
+      return LLVMBuildFNeg(builder, v_arg, "negtmp");
+   }
+
 }

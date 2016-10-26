@@ -25,9 +25,7 @@ public class ExpBinOp extends Exp {
 
    @Override
    public Tree.Node<String> toTree() {
-      return Tree.of(annotateType("ExpBinOp: " + op),
-                     left.toTree(),
-                     right.toTree());
+      return Tree.of(annotateType("ExpBinOp: " + op), left.toTree(), right.toTree());
    }
 
    @Override
@@ -42,9 +40,9 @@ public class ExpBinOp extends Exp {
    }
 
    @Override
-   public LLVMValueRef codegen(LLVMModuleRef module, LLVMBuilderRef builder) {
-      final LLVMValueRef v_left = left.codegen(module, builder);
-      final LLVMValueRef v_right = right.codegen(module, builder);
+   public LLVMValueRef translate(LLVMModuleRef module, LLVMBuilderRef builder) {
+      final LLVMValueRef v_left = left.translate(module, builder);
+      final LLVMValueRef v_right = right.translate(module, builder);
 
       switch (op) {
          case PLUS:
