@@ -9,9 +9,9 @@ import static org.bytedeco.javacpp.LLVM.*;
 
 public class ExpReal extends Exp {
 
-   public final Double value;
+   public final String value;
 
-   public ExpReal(Loc loc, Double value) {
+   public ExpReal(Loc loc, String value) {
       super(loc);
       this.value = value;
    }
@@ -28,6 +28,6 @@ public class ExpReal extends Exp {
 
    @Override
    public LLVMValueRef translate(LLVMModuleRef module, LLVMBuilderRef builder) {
-      return LLVMConstReal(LLVMDoubleType(), value);
+      return LLVMConstRealOfString(LLVMDoubleType(), value);
    }
 }

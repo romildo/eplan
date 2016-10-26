@@ -37,7 +37,7 @@ parser code {:
   }
 :};
 
-terminal Double LITREAL;
+terminal String LITREAL;
 terminal        PLUS, MINUS, TIMES, DIV;
 terminal        LPAREN, RPAREN;
 
