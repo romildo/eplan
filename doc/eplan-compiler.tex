@@ -589,25 +589,22 @@ public static Loc loc(ComplexSymbol a, ComplexSymbol b)
 
 \begin{frame}[fragile,allowframebreaks]{Reportagem de erro}
   \begin{itemize}
-    \item A classe \pyginline|error.ErrorManager| é usada para
-    reportar erros.
-    \item Todos os erros reportados são coletados internamente em uma
-    lista.
-    \item Por padrão os erros reportados são exibidos na saída padrão.
-    \item Use a variável de classe \pyginline|error.ErrorManager.em|
-    para reportar erros.
-    \item Há vários métodos para reportar erros:
+    \item Os erros são reportados por meio do mecanismo de
+    \textbf{exceções} de Java.
+    \item Erros no programa fonte são representados pela classe
+    \pyginline|error.CompileError|, subclasse de
+    \pyginline|RuntimeError|.
+    \item Erros na implementação do compilador são representados pela
+    classe \pyginline|error.FatalError|, também subclasse de
+    \pyginline|RuntimeError|.
+    \item A classe \pyginline|error.ErrorHelper| tem alguns métodos
+    estáticos que facilitam a criação de objetos de erro:
 \begin{pygmented}[]
-   public void error(String format, Object... args)
-   public void error(Loc loc, String format, Object... args)
+static CompilerError error(String message)
+static CompilerError error(String format, Object... args)
+static CompilerError error(Loc loc, String format, Object... args)
 
-   public void warning(String format, Object... args)
-   public void warning(Loc loc, String format, Object... args)
-
-   public void fatal(String format, Object... args)
-   public void fatal(Loc loc, String format, Object... args)
-
-   public void summary()
+static FatalError fatal(String format, Object... args)
 \end{pygmented}
   \end{itemize}
 \end{frame}
@@ -622,7 +619,7 @@ public static Loc loc(ComplexSymbol a, ComplexSymbol b)
     \texttt{src/main/cup/parser.cup}).
     \item Exemplos:
 \begin{pygmented}[]
-terminal Double LITNUM;
+terminal String LITREAL;
 terminal        PLUS, MINUS, TIMES, DIV;
 terminal        LPAREN, RPAREN;
 \end{pygmented}
@@ -672,7 +669,7 @@ private Symbol tok(int type)
 \begin{pygmented}[lang=text]
 [ \t\f\n\r]+           { /* skip */ }
 
-[0-9]+ ("." [0-9]+)?   { return tok(LITNUM, new Double(yytext())); }
+[0-9]+ ("." [0-9]+)?   { return tok(LITREAL, yytext()); }
 
 "+"                    { return tok(PLUS); }
 "-"                    { return tok(MINUS); }
@@ -681,9 +678,9 @@ private Symbol tok(int type)
 "("                    { return tok(LPAREN); }
 ")"                    { return tok(RPAREN); }
 
-.                      { em.error(Loc.loc(locLeft()),
-                                  "unexpected char '%s'",
-                                  yytext()); }
+.                      { throw error(Loc.loc(locLeft()),
+                                     "unexpected char '%s'",
+                                     yytext()); }
 \end{pygmented}
 \end{frame}
 
@@ -733,7 +730,7 @@ private Symbol tok(int type)
 \begin{frame}[fragile,allowframebreaks]{Exemplo de gramática para o CUP}
   \scriptsize
 \begin{pygmented}[]
-terminal Double LITNUM;
+terminal String LITREAL;
 terminal        PLUS, MINUS, TIMES, DIV;
 terminal        LPAREN, RPAREN;
 
@@ -756,7 +753,7 @@ term ::=
 ;
 
 factor ::=
-  LITNUM:x               {: RESULT = new ExpNum(x);                         :}
+  LITREAL:x              {: RESULT = new ExpReal(x);                        :}
 | LPAREN exp:x RPAREN    {: RESULT = x;                                     :}
 ;
 \end{pygmented}
@@ -862,29 +859,29 @@ public abstract class Exp extends AST {
 \end{pygmented}
 \end{frame}
 
-\begin{frame}[fragile,allowframebreaks]{A classe ExpNum}
+\begin{frame}[fragile,allowframebreaks]{A classe ExpReal}
 \begin{pygmented}[]
 package absyn;
 
 import javaslang.collection.Tree;
 
-public class ExpNum extends Exp {
+public class ExpReal extends Exp {
 
-   public final Double value;
+   public final String value;
 
-   public ExpNum(Double value) {
+   public ExpReal(String value) {
       this.value = value;
    }
 
    @Override
    public Tree.Node<String> toTree() {
-      return Tree.of("ExpNum: " + value);
+      return Tree.of("ExpReal: " + value);
    }
 }
 \end{pygmented}
 \end{frame}
 
-\begin{frame}[fragile,allowframebreaks]{A classe ExpNum}
+\begin{frame}[fragile,allowframebreaks]{A classe ExpReal}
   \relscale{0.78}
 \begin{pygmented}[]
 package absyn;
@@ -930,8 +927,8 @@ public class ExpBinOp extends Exp {
 \begin{pygmented}[]
 import static org.bytedeco.javacpp.LLVM.*;
 /* ... */
-public abstract LLVMValueRef codegen(LLVMModuleRef module,
-                                     LLVMBuilderRef builder);
+public abstract LLVMValueRef translate(LLVMModuleRef module,
+                                       LLVMBuilderRef builder);
 \end{pygmented}
     \item Suas subclasses devem implementar este método.
   \end{itemize}
@@ -944,13 +941,13 @@ package absyn;
 // ...
 import static org.bytedeco.javacpp.LLVM.*;
 
-public class ExpNum extends Exp {
+public class ExpReal extends Exp {
    // ...
 
    @Override
-   public LLVMValueRef codegen(LLVMModuleRef module,
-                               LLVMBuilderRef builder) {
-      return LLVMConstReal(LLVMDoubleType(), value);
+   public LLVMValueRef translate(LLVMModuleRef module,
+                                 LLVMBuilderRef builder) {
+      return LLVMConstRealOfString(LLVMDoubleType(), value);
    }
 }
 \end{pygmented}
@@ -963,21 +960,21 @@ package absyn;
 
 // ...
 import static org.bytedeco.javacpp.LLVM.*;
-import static error.ErrorManager.em;
+import static error.ErrorHelper.fatal;
 
 public class ExpBinOp extends Exp {
    // ...
 
    @Override
-   public LLVMValueRef codegen(LLVMModuleRef module, LLVMBuilderRef builder) {
-      final LLVMValueRef v_left = left.codegen(module, builder);
-      final LLVMValueRef v_right = right.codegen(module, builder);
+   public LLVMValueRef translate(LLVMModuleRef module, LLVMBuilderRef builder) {
+      final LLVMValueRef v_left = left.translate(module, builder);
+      final LLVMValueRef v_right = right.translate(module, builder);
       switch (op) {
          case PLUS:  return LLVMBuildFAdd(builder, v_left, v_right, "addtmp");
          case MINUS: return LLVMBuildFSub(builder, v_left, v_right, "subtmp");
          case TIMES: return LLVMBuildFMul(builder, v_left, v_right, "multmp");
          case DIV:   return LLVMBuildFDiv(builder, v_left, v_right, "divtmp");
-         default:    em.fatal("unknown operator %s in binary operation", op);
+         default:    fatal("unknown operator %s in binary operation", op);
                      return LLVMConstReal(LLVMDoubleType(), 0);
       }
    }
@@ -999,7 +996,7 @@ public class ExpBinOp extends Exp {
         \item subclasse de \pyginline|absyn.Exp|
         \item contendo um campo correspondente ao operando da negação
         \item implementar o método \pyginline|toTree|
-        \item implementar o método \pyginline|codegen|
+        \item implementar o método \pyginline|translate|
       \end{itemize}
       \item Acrescentar uma regra de produção adequada na gramática da
       linguagem.
@@ -1070,9 +1067,9 @@ public abstract class AST implements ToTree<String> {
 \begin{pygmented}[]
 public class ExpReal extends Exp {
 
-   public final Double value;
+   public final String value;
 
-   public ExpReal(Loc loc, Double value) {
+   public ExpReal(Loc loc, String value) {
       super(loc);
       this.value = value;
    }
@@ -1087,7 +1084,7 @@ public class ExpReal extends Exp {
     analisador sintático deve informar a localização. Exemplo:
 \begin{pygmented}[]
 factor ::=
-  LITNUM:x {: RESULT = new ExpReal(loc(xxleft,xxright), x); :}
+  LITREAL:x {: RESULT = new ExpReal(loc(xxleft,xxright), x); :}
 ;
 \end{pygmented}
 
@@ -1141,7 +1138,7 @@ factor ::=
     \end{itemize}
     \framebreak
     
-    \item[\pyginline|boolean canBe(Type type)|]\mbox{}\newline
+    \item[\pyginline|boolean is(Type type)|]\mbox{}\newline
     \begin{itemize}
       \item Verifica se o tipo que recebe a mensagem é compatível (é igual
       ou pode ser convertido para) o tipo dado como argumento.
@@ -1157,7 +1154,7 @@ factor ::=
     \end{itemize}
     \framebreak
 
-    \item[\pyginline|boolean canBe(Type... types)|]\mbox{}\newline
+    \item[\pyginline|boolean is(Type... types)|]\mbox{}\newline
     \begin{itemize}
       \item Verifica a compatibilidade com algum dos tipos dados como
       argumentos.
@@ -1168,14 +1165,15 @@ factor ::=
 
 \begin{frame}[fragile,allowframebreaks]{Reportando erros comuns}
   \begin{itemize}
-    \item A interface \pyginline|error.CommonErrors| define alguns
-    métodos para reportar erros comumente encontrados pelo compilador.
+    \item A interface \pyginline|semantic.SemanticHelper| define
+    alguns métodos para reportar erros comumente encontrados pelo
+    compilador no código fonte.
 
     \item Um dos erros mais comuns é a inconsistência de tipos.
 \begin{pygmented}[]
-public interface CommonErrors {
+public interface SemanticHelper {
 
-   default void typeMismatch(Loc loc, Type found, Type... expected) {
+   static CompilerError typeMismatch(Loc loc, Type found, Type... expected)
       // ...
    }
 
@@ -1261,7 +1259,7 @@ public class ExpReal extends Exp {
   Implementar \textbf{literais inteiros} no compilador de \lang{}.
   \begin{enumerate}
     \item Para desenvolver esta atividade faça o \emph{checkout} da
-    \alert{versão 0.16} do projeto.
+    \alert{versão 0.17} do projeto.
     
     \item Definir uma nova classe \pyginline|types.INT| para
     representar o tipo \texttt{int} de \lang{}.
@@ -1273,14 +1271,14 @@ public class ExpReal extends Exp {
       \item contendo um campo correspondente ao valor da constante
       \item implementar o método \pyginline|toTree|
       \item implementar o método \pyginline|semantic_|
-      \item implementar o método \pyginline|codegen|
+      \item implementar o método \pyginline|translate|
     \end{itemize}
     
     \item Modifique a classe \pyginline|absyn.ExpBinOp| de forma que
     os operadores aritméticos aceitem operandos inteiros e
     reais. Neste momento não é necessário fazer conversão implícita
     dos operandos de inteiro para real. Por hora os operandos devem
-    ser do mesmo tipo numérico.
+    apenas ser do mesmo tipo numérico.
 
     \item Acrescentar na gramática da linguagem:
     \begin{itemize}
@@ -1300,8 +1298,19 @@ public class ExpReal extends Exp {
     \end{itemize}
 
     \item Definir a função \pyginline|__eplan_print_int| (em C) na
-    biblioteca padrão de \lang{} para exibir um valor inteiro.
+    biblioteca padrão de \lang{} para exibir um valor inteiro. O
+    protótipo da função deve ser:
+\begin{pygmented}[]
+extern void __eplan_print_int(const int32_t x)
+\end{pygmented}
+    O tipo \pyginline|int32_t| está definido em
+    \texttt{inttypes.h}. Use a função \pyginline|printf| e a macro
+    \pyginline|PRIi32| na formatação da saída.
 
+    \item Modificar o método \pyginline|addRuntime| na classe
+    \pyginline|translate.Generator| para adicionar o protótipo da função
+    \pyginline|__eplan_print_int| no código gerado.
+    
     \item Modificar o método \pyginline|addPrintResult| na classe
     \pyginline|codegen.Generator| para considerar o caso de valores
     inteiros. Este método gera código para exibir o valor de uma
@@ -1311,7 +1320,7 @@ public class ExpReal extends Exp {
   \begin{tips}
     \item Na geração de código use os métodos
 
-    \href{http://bytedeco.org/javacpp-presets/llvm/apidocs/org/bytedeco/javacpp/LLVM.html#LLVMConstInt-org.bytedeco.javacpp.LLVM.LLVMTypeRef-long-int-}{\pyginline|LLVMConstInt|}
+    \href{http://bytedeco.org/javacpp-presets/llvm/apidocs/org/bytedeco/javacpp/LLVM.html#LLVMConstIntOfString-org.bytedeco.javacpp.LLVM.LLVMTypeRef-java.lang.String-byte-}{\pyginline|LLVMConstIntOfString|}
 
     \href{http://bytedeco.org/javacpp-presets/llvm/apidocs/org/bytedeco/javacpp/LLVM.html#LLVMBuildAdd-org.bytedeco.javacpp.LLVM.LLVMBuilderRef-org.bytedeco.javacpp.LLVM.LLVMValueRef-org.bytedeco.javacpp.LLVM.LLVMValueRef-java.lang.String-}{\pyginline|LLVMBuildAdd|}
 
