@@ -1,6 +1,6 @@
 package parse;
 
-import error.ErrorManager;
+import error.ErrorHelper;
 import java_cup.runtime.Symbol;
 import java_cup.runtime.ComplexSymbolFactory.ComplexSymbol;
 import absyn.*;
@@ -30,10 +30,10 @@ parser code {:
   }
   public void report_fatal_error(String message, Object info) {
      done_parsing();
-     ErrorManager.em.fatal(locOfInfo(info), message + lexemeOfInfo(info) + "\nCan't recover from previous error(s), giving up.");
+     throw ErrorHelper.error(locOfInfo(info), "%s%s%nCan't recover from previous error(s), giving up.", message, lexemeOfInfo(info));
   }
   public void report_error(String message, Object info) {
-     ErrorManager.em.error(locOfInfo(info), message + lexemeOfInfo(info));
+     throw ErrorHelper.error(locOfInfo(info), "%s%s", message, lexemeOfInfo(info));
   }
 :};
 

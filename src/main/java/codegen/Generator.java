@@ -8,7 +8,7 @@ import types.REAL;
 import types.Type;
 
 import static org.bytedeco.javacpp.LLVM.*;
-import static error.ErrorManager.em;
+import static error.ErrorHelper.fatal;
 
 // http://llvm.org/releases/3.8.0/docs/index.html
 // http://llvm.org/releases/3.8.0/docs/tutorial/index.html
@@ -49,14 +49,14 @@ public class Generator {
 
       LLVMExecutionEngineRef engine = new LLVMExecutionEngineRef();
       if (LLVMCreateJITCompilerForModule(engine, mod, 2, error) != 0) {
-         em.fatal(error.getString());
+         fatal(error.getString());
          LLVMDisposeMessage(error);
       }
 
       // LLVMDumpModule(mod);
 
       if (LLVMPrintModuleToFile(mod, name + ".ll", error) != 0) {
-         em.fatal(error.getString());
+         fatal(error.getString());
          LLVMDisposeMessage(error);
       }
       else

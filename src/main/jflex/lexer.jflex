@@ -1,6 +1,6 @@
 package parse;
 
-import static error.ErrorManager.em;
+import static error.ErrorHelper.error;
 
 import java_cup.runtime.Symbol;
 import java_cup.runtime.SymbolFactory;
@@ -73,4 +73,4 @@ import java_cup.runtime.ComplexSymbolFactory;
 "("                  { return tok(LPAREN); }
 ")"                  { return tok(RPAREN); }
 
-.                    { em.error(Loc.loc(locLeft()), "unexpected char '%s'", yytext()); }
+.                    { throw error(Loc.loc(locLeft()), "unexpected char '%s'", yytext()); }
