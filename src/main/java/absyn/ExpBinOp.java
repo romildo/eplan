@@ -2,6 +2,7 @@ package absyn;
 
 import javaslang.collection.Tree;
 import parse.Loc;
+import types.INT;
 import types.REAL;
 import types.Type;
 
@@ -33,27 +34,53 @@ public class ExpBinOp extends Exp {
    protected Type semantic_() {
       final Type t_left = left.semantic();
       final Type t_right = right.semantic();
-      if (! t_left.is(REAL.T))
-         throw typeMismatch(left.loc, t_left, REAL.T);
-      if (! t_right.is(REAL.T))
-         throw typeMismatch(right.loc, t_right, REAL.T);
-      return REAL.T;
+
+      if (!t_left.is(INT.T, REAL.T))
+         throw typeMismatch(left.loc, t_left, INT.T, REAL.T);
+
+      if (!t_right.is(INT.T, REAL.T))
+         throw typeMismatch(right.loc, t_right, INT.T, REAL.T);
+
+      if (t_left.is(REAL.T) || t_right.is(REAL.T))
+         return REAL.T;
+
+      return INT.T;
    }
 
    @Override
    public LLVMValueRef translate(LLVMModuleRef module, LLVMBuilderRef builder) {
-      final LLVMValueRef v_left = left.translate(module, builder);
-      final LLVMValueRef v_right = right.translate(module, builder);
+      LLVMValueRef v_left = left.translate(module, builder);
+      LLVMValueRef v_right = right.translate(module, builder);
+
+      if (type instanceof REAL) {
+         if (left.type instanceof INT)
+            v_left = int2real(builder, v_left);
+
+         if (right.type instanceof INT)
+            v_right = int2real(builder, v_right);
+      }
 
       switch (op) {
          case PLUS:
-            return LLVMBuildFAdd(builder, v_left, v_right, "addtmp");
+            if (type instanceof INT)
+               return LLVMBuildAdd(builder, v_left, v_right, "tmpadd");
+            else
+               return LLVMBuildFAdd(builder, v_left, v_right, "tmpadd");
          case MINUS:
-            return LLVMBuildFSub(builder, v_left, v_right, "subtmp");
+            if (type instanceof INT)
+               return LLVMBuildSub(builder, v_left, v_right, "tmpsub");
+            else
+               return LLVMBuildFSub(builder, v_left, v_right, "tmpsub");
          case TIMES:
-            return LLVMBuildFMul(builder, v_left, v_right, "multmp");
+            if (type instanceof INT)
+               return LLVMBuildMul(builder, v_left, v_right, "tmpmul");
+            else
+               return LLVMBuildFMul(builder, v_left, v_right, "tmpmul");
          case DIV:
-            return LLVMBuildFDiv(builder, v_left, v_right, "divtmp");
+            if (type instanceof INT)
+               return LLVMBuildSDiv(builder, v_left, v_right, "tmpdiv");
+            else
+               return LLVMBuildFDiv(builder, v_left, v_right, "tmpdiv");
          default:
             throw fatal("unknown operator %s in binary operation", op);
       }

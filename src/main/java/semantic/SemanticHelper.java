@@ -1,6 +1,8 @@
 package semantic;
 
 import error.CompilerError;
+import static org.bytedeco.javacpp.LLVM.*;
+
 import parse.Loc;
 import types.Type;
 
@@ -18,6 +20,10 @@ public interface SemanticHelper {
          }
       }
       return new CompilerError(loc, "type mismatch: found %s but expected %s", found, builder);
+   }
+
+   static LLVMValueRef int2real(LLVMBuilderRef builder, LLVMValueRef value) {
+      return LLVMBuildSIToFP(builder, value, LLVMDoubleType(), "tmpcast");
    }
 
 }

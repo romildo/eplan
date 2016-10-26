@@ -4,6 +4,7 @@ import absyn.Exp;
 import org.bytedeco.javacpp.BytePointer;
 import org.bytedeco.javacpp.Pointer;
 import org.bytedeco.javacpp.PointerPointer;
+import types.INT;
 import types.REAL;
 import types.Type;
 
@@ -86,6 +87,7 @@ public class Generator {
 
    public static void addRuntime(LLVMModuleRef module,
                                  LLVMBuilderRef builder) {
+      addPrototype(module, builder, "__eplan_print_int", LLVMVoidType(), LLVMInt32Type());
       addPrototype(module, builder, "__eplan_print_double", LLVMVoidType(), LLVMDoubleType());
       addPrototype(module, builder, "llvm.pow.f64", LLVMDoubleType(), LLVMDoubleType(), LLVMDoubleType());
    }
@@ -94,6 +96,8 @@ public class Generator {
                                              LLVMBuilderRef builder,
                                              Type t_exp,
                                              LLVMValueRef v_exp) {
+      if (t_exp instanceof INT)
+         return addCall(module, builder, "__eplan_print_int", v_exp);
       if (t_exp instanceof REAL) {
          return addCall(module, builder, "__eplan_print_double", v_exp);
       }
