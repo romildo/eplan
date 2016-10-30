@@ -38,6 +38,7 @@ parser code {:
 :};
 
 terminal String LITREAL;
+terminal String LITINT;
 terminal        PLUS, MINUS, TIMES, DIV;
 terminal        LPAREN, RPAREN;
 
@@ -65,7 +66,8 @@ term ::=
 ;
 
 factor ::=
-  LITREAL:x              {: RESULT = new ExpReal(loc(xxleft,xxright), x); :}
+  LITINT:x               {: RESULT = new ExpInt(loc(xxleft,xxright), x); :}
+| LITREAL:x              {: RESULT = new ExpReal(loc(xxleft,xxright), x); :}
 | MINUS:m factor:x       {: RESULT = new ExpNegate(loc(mxleft,xxright), x); :}
 | LPAREN exp:x RPAREN    {: RESULT = x; :}
 ;

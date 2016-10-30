@@ -63,13 +63,14 @@ import java_cup.runtime.ComplexSymbolFactory;
 litint    = [0-9]+
 litfloat1 = [0-9]+ "." [0-9]*
 litfloat2 = [0-9]* "." [0-9]+
-litfloat3 = ({litint} | {litfloat1} | {litfloat2}) [eE] [+-]? {litint}
-litreal   = {litint} | {litfloat1} | {litfloat2} | {litfloat3}
+litfloat3 = ({litfloat1} | {litfloat2}) [eE] [+-]? {litint}
+litreal   = {litfloat1} | {litfloat2} | {litfloat3}
 
 %%
 
 [ \t\f\n\r]+         { /* skip */ }
 
+{litint}             { return tok(LITINT, yytext()); }
 {litreal}            { return tok(LITREAL, yytext()); }
 
 "+"                  { return tok(PLUS); }
