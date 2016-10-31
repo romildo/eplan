@@ -2,6 +2,7 @@ package absyn;
 
 import javaslang.collection.Tree;
 import parse.Loc;
+import types.INT;
 import types.REAL;
 import types.Type;
 
@@ -34,11 +35,21 @@ public class ExpBinOp extends Exp {
    protected Type semantic_() {
       final Type t_left = left.semantic();
       final Type t_right = right.semantic();
-      if (! t_left.canBe(REAL.T))
-         typeMismatch(left.loc, t_left, REAL.T);
-      if (! t_right.canBe(REAL.T))
-         typeMismatch(right.loc, t_right, REAL.T);
-      return REAL.T;
+
+      if (t_left.canBe(INT.T)) {
+         if (!t_right.canBe(INT.T))
+            typeMismatch(left.loc, t_right, INT.T);
+         return t_left;
+      }
+      else if (t_left.canBe(REAL.T)) {
+         if (!t_right.canBe(REAL.T))
+            typeMismatch(left.loc, t_right, REAL.T);
+         return t_left;
+      }
+      else{
+         typeMismatch(left.loc, t_left, INT.T, REAL.T);
+         return INT.T;
+      }
    }
 
    @Override
@@ -48,13 +59,25 @@ public class ExpBinOp extends Exp {
 
       switch (op) {
          case PLUS:
-            return LLVMBuildFAdd(builder, v_left, v_right, "addtmp");
+            if (left.type.canBe(INT.T))
+               return LLVMBuildAdd(builder, v_left, v_right, "addtmp");
+            else
+               return LLVMBuildFAdd(builder, v_left, v_right, "addtmp");
          case MINUS:
-            return LLVMBuildFSub(builder, v_left, v_right, "subtmp");
+            if (left.type.canBe(INT.T))
+               return LLVMBuildSub(builder, v_left, v_right, "subtmp");
+            else
+               return LLVMBuildFSub(builder, v_left, v_right, "subtmp");
          case TIMES:
-            return LLVMBuildFMul(builder, v_left, v_right, "multmp");
+            if (left.type.canBe(INT.T))
+               return LLVMBuildMul(builder, v_left, v_right, "multmp");
+            else
+               return LLVMBuildFMul(builder, v_left, v_right, "multmp");
          case DIV:
-            return LLVMBuildFDiv(builder, v_left, v_right, "divtmp");
+            if (left.type.canBe(INT.T))
+               return LLVMBuildSDiv(builder, v_left, v_right, "divtmp");
+            else
+               return LLVMBuildFDiv(builder, v_left, v_right, "divtmp");
          default:
             em.fatal("unknown operator %s in binary operation", op);
             return LLVMConstReal(LLVMDoubleType(), 0);
