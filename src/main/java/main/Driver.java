@@ -168,7 +168,7 @@ public class Driver {
          throw fatal("internal error: program should be an expression");
 
       final Exp main = (Exp) parseTree;
-      main.semantic();
+      main.semantic(new env.Env());
       if (options.pp_annotated_ast) {
          System.out.println("===Annotated abstract syntax tree:===========");
          System.out.println();

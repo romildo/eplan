@@ -1,5 +1,6 @@
 package absyn;
 
+import env.Env;
 import javaslang.collection.Tree;
 import parse.Loc;
 import types.INT;
@@ -25,8 +26,8 @@ public class ExpNegate extends Exp {
    }
 
    @Override
-   protected Type semantic_() {
-      final Type t_arg = arg.semantic();
+   protected Type semantic_(Env env) {
+      final Type t_arg = arg.semantic(env);
 
       if (t_arg instanceof INT || t_arg instanceof REAL)
          return t_arg;

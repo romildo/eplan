@@ -1,5 +1,6 @@
 package absyn;
 
+import env.Env;
 import parse.Loc;
 import types.Type;
 
@@ -21,15 +22,14 @@ public abstract class Exp extends AST {
    }
 
    // Do semantic analysis of the expression
-   public Type semantic() {
-      type = semantic_();
+   public Type semantic(Env env) {
+      type = semantic_(env);
       return type;
    }
 
    // Type check the expression. Should be defined in the concrete subclasses.
-   protected abstract Type semantic_();
+   protected abstract Type semantic_(Env env);
 
    // Generate code for the LLVM IR (intermediate representation)
    public abstract LLVMValueRef translate(LLVMModuleRef module, LLVMBuilderRef builder);
-
 }

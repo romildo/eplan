@@ -1,5 +1,6 @@
 package absyn;
 
+import env.Env;
 import javaslang.collection.Tree;
 import parse.Loc;
 import types.REAL;
@@ -22,7 +23,7 @@ public class ExpReal extends Exp {
    }
 
    @Override
-   protected Type semantic_() {
+   protected Type semantic_(Env env) {
       return REAL.T;
    }
 

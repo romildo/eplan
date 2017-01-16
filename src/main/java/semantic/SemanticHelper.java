@@ -22,6 +22,22 @@ public interface SemanticHelper {
       return new CompilerError(loc, "type mismatch: found %s but expected %s", found, builder);
    }
 
+   static CompilerError undefined(Loc loc, String category, String name) {
+      return new CompilerError(loc, "undefined %s '%s'", category, name);
+   }
+
+   static CompilerError notAFunction(Loc loc, String name) {
+      return new CompilerError(loc, "'%s' is not a function", name);
+   }
+
+   static CompilerError tooFewArguments(Loc loc, String name) {
+      return new CompilerError(loc, "too few arguments in call to '%s'", name);
+   }
+
+   static CompilerError tooMuchArguments(Loc loc, String name) {
+      return new CompilerError(loc, "too much arguments in call to '%s'", name);
+   }
+
    static LLVMValueRef int2real(LLVMBuilderRef builder, LLVMValueRef value) {
       return LLVMBuildSIToFP(builder, value, LLVMDoubleType(), "tmpcast");
    }
