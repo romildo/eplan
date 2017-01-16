@@ -3,6 +3,7 @@ package parse;
 import error.ErrorHelper;
 import java_cup.runtime.Symbol;
 import java_cup.runtime.ComplexSymbolFactory.ComplexSymbol;
+import javaslang.collection.List;
 import absyn.*;
 
 parser code {:
@@ -39,13 +40,16 @@ parser code {:
 
 terminal String LITINT;
 terminal String LITREAL;
+terminal String ID;
 terminal        PLUS, MINUS, TIMES, DIV;
 terminal        LPAREN, RPAREN;
+terminal        COMMA;
 
-non terminal Exp program;
-non terminal Exp exp;
-non terminal Exp term;
-non terminal Exp factor;
+non terminal Exp       program;
+non terminal Exp       exp;
+non terminal Exp       term;
+non terminal Exp       factor;
+non terminal List<Exp> exps, expsRest;
 
 start with program;
 
@@ -54,20 +58,31 @@ program ::=
 ;
 
 exp ::=
-  exp:x PLUS term:y      {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.PLUS, x, y); :}
-| exp:x MINUS term:y     {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.MINUS, x, y); :}
-| term:x                 {: RESULT = x; :}
+  exp:x PLUS term:y            {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.PLUS, x, y); :}
+| exp:x MINUS term:y           {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.MINUS, x, y); :}
+| term:x                       {: RESULT = x; :}
 ;
 
 term ::=
-  term:x TIMES factor:y  {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.TIMES, x, y); :}
-| term:x DIV factor:y    {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.DIV, x, y); :}
-| factor:x               {: RESULT = x; :}
+  term:x TIMES factor:y        {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.TIMES, x, y); :}
+| term:x DIV factor:y          {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.DIV, x, y); :}
+| factor:x                     {: RESULT = x; :}
 ;
 
 factor ::=
-  LITINT:x               {: RESULT = new ExpInt(loc(xxleft,xxright), x); :}
-| LITREAL:x              {: RESULT = new ExpReal(loc(xxleft,xxright), x); :}
-| MINUS:m factor:x       {: RESULT = new ExpNegate(loc(mxleft,xxright), x); :}
-| LPAREN exp:x RPAREN    {: RESULT = x; :}
+  LITINT:x                     {: RESULT = new ExpInt(loc(xxleft,xxright), x); :}
+| LITREAL:x                    {: RESULT = new ExpReal(loc(xxleft,xxright), x); :}
+| MINUS:m factor:x             {: RESULT = new ExpNegate(loc(mxleft,xxright), x); :}
+| LPAREN exp:x RPAREN          {: RESULT = x; :}
+| ID:f LPAREN exps:x RPAREN:r  {: RESULT = new ExpCall(loc(fxleft,rxright), f, x); :}
+;
+
+exps ::=
+  /* empty */                  {: RESULT = List.empty(); :}
+| exp:x expsRest:xs            {: RESULT = xs.prepend(x); :}
+;
+
+expsRest ::=
+  /* empty */                  {: RESULT = List.empty(); :}
+| COMMA exp:x expsRest:xs      {: RESULT = xs.prepend(x); :}
 ;
