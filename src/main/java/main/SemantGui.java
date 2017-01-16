@@ -227,7 +227,7 @@ public class SemantGui extends JFrame implements ActionListener {
          tree.setModel(treeModel);
          for (int row = 0; row < tree.getRowCount(); row++)
             tree.expandRow(row);
-         types.Type et = exp.semantic();
+         types.Type et = exp.semantic(new env.Env());
          logArea.append("===> " + et.toString() + "\n");
       }
       catch (CompilerError e) {

@@ -1,5 +1,6 @@
 package absyn;
 
+import env.Env;
 import javaslang.collection.Tree;
 import parse.Loc;
 import types.INT;
@@ -31,9 +32,9 @@ public class ExpBinOp extends Exp {
    }
 
    @Override
-   protected Type semantic_() {
-      final Type t_left = left.semantic();
-      final Type t_right = right.semantic();
+   protected Type semantic_(Env env) {
+      final Type t_left = left.semantic(env);
+      final Type t_right = right.semantic(env);
 
       if (!t_left.is(INT.T, REAL.T))
          throw typeMismatch(left.loc, t_left, INT.T, REAL.T);
@@ -85,4 +86,5 @@ public class ExpBinOp extends Exp {
             throw fatal("unknown operator %s in binary operation", op);
       }
    }
+
 }
