@@ -66,12 +66,16 @@ litfloat2 = [0-9]* "." [0-9]+
 litfloat3 = ({litint} | {litfloat1} | {litfloat2}) [eE] [+-]? {litint}
 litreal   = {litint} | {litfloat1} | {litfloat2} | {litfloat3}
 
+id        = [a-zA-Z][a-zA-Z0-9_]*
+
 %%
 
 [ \t\f\n\r]+         { /* skip */ }
 
 {litint}             { return tok(LITINT, yytext()); }
 {litreal}            { return tok(LITREAL, yytext()); }
+
+{id}                 { return tok(ID, yytext().intern()); }
 
 "+"                  { return tok(PLUS); }
 "-"                  { return tok(MINUS); }
