@@ -83,5 +83,6 @@ id        = [a-zA-Z][a-zA-Z0-9_]*
 "/"                  { return tok(DIV); }
 "("                  { return tok(LPAREN); }
 ")"                  { return tok(RPAREN); }
+","                  { return tok(COMMA); }
 
 .                    { throw error(Loc.loc(locLeft()), "unexpected char '%s'", yytext()); }
