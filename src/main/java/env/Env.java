@@ -16,6 +16,7 @@ public class Env {
     venv = new Table<Type>();
     put(venv, "print_int",  new FUNCTION(UNIT.T, INT.T));
     put(venv, "print_real", new FUNCTION(UNIT.T, REAL.T));
+    put(venv, "print_unit", new FUNCTION(UNIT.T, UNIT.T));
     put(venv, "round",      new FUNCTION(INT.T, REAL.T));
     put(venv, "ceil",       new FUNCTION(INT.T, REAL.T));
     put(venv, "floor",      new FUNCTION(INT.T, REAL.T));
