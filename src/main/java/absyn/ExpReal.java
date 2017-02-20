@@ -6,8 +6,6 @@ import parse.Loc;
 import types.REAL;
 import types.Type;
 
-import static org.bytedeco.javacpp.LLVM.*;
-
 public class ExpReal extends Exp {
 
    public final String value;
@@ -25,10 +23,5 @@ public class ExpReal extends Exp {
    @Override
    protected Type semantic_(Env env) {
       return REAL.T;
-   }
-
-   @Override
-   public LLVMValueRef translate(LLVMModuleRef module, LLVMBuilderRef builder) {
-      return LLVMConstRealOfString(LLVMDoubleType(), value);
    }
 }

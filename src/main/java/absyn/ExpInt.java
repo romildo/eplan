@@ -6,8 +6,6 @@ import parse.Loc;
 import types.INT;
 import types.Type;
 
-import static org.bytedeco.javacpp.LLVM.*;
-
 public class ExpInt extends Exp {
 
    public final String value;
@@ -25,10 +23,5 @@ public class ExpInt extends Exp {
    @Override
    protected Type semantic_(Env env) {
       return INT.T;
-   }
-
-   @Override
-   public LLVMValueRef translate(LLVMModuleRef module, LLVMBuilderRef builder) {
-      return LLVMConstIntOfString(LLVMInt32Type(), value, (byte)10);
    }
 }

@@ -7,7 +7,6 @@ import types.INT;
 import types.REAL;
 import types.Type;
 
-import static org.bytedeco.javacpp.LLVM.*;
 import static error.ErrorHelper.*;
 import static semantic.SemanticHelper.*;
 
@@ -33,19 +32,6 @@ public class ExpNegate extends Exp {
          return t_arg;
 
       throw typeMismatch(arg.loc, t_arg, INT.T, REAL.T);
-   }
-
-   @Override
-   public LLVMValueRef translate(LLVMModuleRef module, LLVMBuilderRef builder) {
-      final LLVMValueRef v_arg = arg.translate(module, builder);
-
-      if (type instanceof INT)
-         return LLVMBuildNeg(builder, v_arg, "tmpneg");
-
-      if (type instanceof REAL)
-         return LLVMBuildFNeg(builder, v_arg, "tmpneg");
-
-      throw fatal("unexpected type '%s'", type);
    }
 
 }

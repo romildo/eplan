@@ -7,9 +7,7 @@ import parse.Loc;
 import types.FUNCTION;
 import types.Type;
 
-import static codegen.Generator.addCall;
 import static semantic.SemanticHelper.*;
-import static org.bytedeco.javacpp.LLVM.*;
 
 
 public class ExpCall extends Exp {
@@ -57,7 +55,7 @@ public class ExpCall extends Exp {
          Type t_par = parameters.head();
          // are the argument of the expected type?
          if (!t_arg.is(t_par))
-            typeMismatch(arg.loc, t_arg, t_par);
+            throw typeMismatch(arg.loc, t_arg, t_par);
          // advances to the next argument
          parameters = parameters.tail();
          arguments = arguments.tail();
@@ -70,13 +68,6 @@ public class ExpCall extends Exp {
       if (parameters.nonEmpty())
          throw tooFewArguments(loc, function);
       return signature.result;
-   }
-
-   @Override
-   public LLVMValueRef translate(LLVMModuleRef module, LLVMBuilderRef builder) {
-      LLVMValueRef[] v_args = args.map(exp -> exp.translate(module, builder))
-                                  .toJavaArray(LLVMValueRef.class);
-      return addCall(module, builder, function, v_args);
    }
 
 }
