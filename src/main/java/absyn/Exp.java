@@ -4,8 +4,6 @@ import env.Env;
 import parse.Loc;
 import types.Type;
 
-import static org.bytedeco.javacpp.LLVM.*;
-
 public abstract class Exp extends AST {
 
    // Type of the expression, calculated by the semantic analyser
@@ -29,7 +27,4 @@ public abstract class Exp extends AST {
 
    // Type check the expression. Should be defined in the concrete subclasses.
    protected abstract Type semantic_(Env env);
-
-   // Generate code for the LLVM IR (intermediate representation)
-   public abstract LLVMValueRef translate(LLVMModuleRef module, LLVMBuilderRef builder);
 }

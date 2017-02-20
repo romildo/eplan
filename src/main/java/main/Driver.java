@@ -184,8 +184,6 @@ public class Driver {
       if (options.dot_annotted_ast) {
          DotFile.write(parseTree.toTree(), name + ".annotated.dot");
       }
-
-      codegen.Generator.codegen(name, main);
    }
 
 }

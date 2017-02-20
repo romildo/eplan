@@ -9,10 +9,6 @@ else
     ./driver $@
 fi || exit $?
 
-echo "Object code (LLVM IR)"
-echo "-------------------------------------------------"
-cat $F.ll
-
 if command -v dot >/dev/null 2>&1; then
     echo "Generating image of AST"
     echo "-------------------------------------------------"
@@ -23,15 +19,3 @@ if command -v dot >/dev/null 2>&1; then
         $IMGVIEWER $F.annotated.dot.png &> /dev/null
     fi
 fi
-
-echo "Compile to assembly"
-echo "-------------------------------------------------"
-llc $F.ll
-
-echo "Generate executble"
-echo "-------------------------------------------------"
-clang $F.s src/main/c/bindings.c -lm -o $F.exe
-
-echo "Run the executable:"
-echo "-------------------------------------------------"
-./$F.exe

@@ -7,7 +7,6 @@ import types.INT;
 import types.REAL;
 import types.Type;
 
-import static org.bytedeco.javacpp.LLVM.*;
 import static error.ErrorHelper.fatal;
 import static semantic.SemanticHelper.*;
 
@@ -46,45 +45,6 @@ public class ExpBinOp extends Exp {
          return REAL.T;
 
       return INT.T;
-   }
-
-   @Override
-   public LLVMValueRef translate(LLVMModuleRef module, LLVMBuilderRef builder) {
-      LLVMValueRef v_left = left.translate(module, builder);
-      LLVMValueRef v_right = right.translate(module, builder);
-
-      if (type instanceof REAL) {
-         if (left.type instanceof INT)
-            v_left = int2real(builder, v_left);
-
-         if (right.type instanceof INT)
-            v_right = int2real(builder, v_right);
-      }
-
-      switch (op) {
-         case PLUS:
-            if (type instanceof INT)
-               return LLVMBuildAdd(builder, v_left, v_right, "tmpadd");
-            else
-               return LLVMBuildFAdd(builder, v_left, v_right, "tmpadd");
-         case MINUS:
-            if (type instanceof INT)
-               return LLVMBuildSub(builder, v_left, v_right, "tmpsub");
-            else
-               return LLVMBuildFSub(builder, v_left, v_right, "tmpsub");
-         case TIMES:
-            if (type instanceof INT)
-               return LLVMBuildMul(builder, v_left, v_right, "tmpmul");
-            else
-               return LLVMBuildFMul(builder, v_left, v_right, "tmpmul");
-         case DIV:
-            if (type instanceof INT)
-               return LLVMBuildSDiv(builder, v_left, v_right, "tmpdiv");
-            else
-               return LLVMBuildFDiv(builder, v_left, v_right, "tmpdiv");
-         default:
-            throw fatal("unknown operator %s in binary operation", op);
-      }
    }
 
 }

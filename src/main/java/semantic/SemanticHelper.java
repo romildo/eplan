@@ -1,7 +1,6 @@
 package semantic;
 
 import error.CompilerError;
-import static org.bytedeco.javacpp.LLVM.*;
 
 import parse.Loc;
 import types.Type;
@@ -36,10 +35,6 @@ public interface SemanticHelper {
 
    static CompilerError tooMuchArguments(Loc loc, String name) {
       return new CompilerError(loc, "too much arguments in call to '%s'", name);
-   }
-
-   static LLVMValueRef int2real(LLVMBuilderRef builder, LLVMValueRef value) {
-      return LLVMBuildSIToFP(builder, value, LLVMDoubleType(), "tmpcast");
    }
 
 }
