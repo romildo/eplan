@@ -12,11 +12,13 @@ public class Env {
     put(tenv, "unit", UNIT.T);
     put(tenv, "int",  INT.T);
     put(tenv, "real", REAL.T);
+    put(tenv, "bool", BOOL.T);
 
     venv = new Table<Type>();
     put(venv, "print_int",  new FUNCTION(UNIT.T, INT.T));
     put(venv, "print_real", new FUNCTION(UNIT.T, REAL.T));
     put(venv, "print_unit", new FUNCTION(UNIT.T, UNIT.T));
+    put(venv, "print_bool", new FUNCTION(UNIT.T, BOOL.T));
     put(venv, "round",      new FUNCTION(INT.T, REAL.T));
     put(venv, "ceil",       new FUNCTION(INT.T, REAL.T));
     put(venv, "floor",      new FUNCTION(INT.T, REAL.T));
