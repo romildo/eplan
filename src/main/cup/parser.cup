@@ -40,16 +40,19 @@ parser code {:
 
 terminal String LITINT;
 terminal String LITREAL;
+terminal String LITBOOL;
 terminal String ID;
-terminal        PLUS, MINUS, TIMES, DIV;
+terminal        PLUS, MINUS, TIMES, DIV, UMINUS;
 terminal        LPAREN, RPAREN;
 terminal        COMMA;
 
 non terminal Exp       program;
 non terminal Exp       exp;
-non terminal Exp       term;
-non terminal Exp       factor;
 non terminal List<Exp> exps, expsRest;
+
+precedence left PLUS, MINUS;
+precedence left TIMES, DIV;
+precedence left UMINUS;
 
 start with program;
 
@@ -58,21 +61,14 @@ program ::=
 ;
 
 exp ::=
-  exp:x PLUS term:y            {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.PLUS, x, y); :}
-| exp:x MINUS term:y           {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.MINUS, x, y); :}
-| term:x                       {: RESULT = x; :}
-;
-
-term ::=
-  term:x TIMES factor:y        {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.TIMES, x, y); :}
-| term:x DIV factor:y          {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.DIV, x, y); :}
-| factor:x                     {: RESULT = x; :}
-;
-
-factor ::=
-  LITINT:x                     {: RESULT = new ExpInt(loc(xxleft,xxright), x); :}
+  exp:x PLUS exp:y             {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.PLUS, x, y); :}
+| exp:x MINUS exp:y            {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.MINUS, x, y); :}
+| exp:x TIMES exp:y            {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.TIMES, x, y); :}
+| exp:x DIV exp:y              {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.DIV, x, y); :}
+| LITINT:x                     {: RESULT = new ExpInt(loc(xxleft,xxright), x); :}
 | LITREAL:x                    {: RESULT = new ExpReal(loc(xxleft,xxright), x); :}
-| MINUS:m factor:x             {: RESULT = new ExpNegate(loc(mxleft,xxright), x); :}
+| LITBOOL:x                    {: RESULT = new ExpBool(loc(xxleft,xxright), x); :}
+| MINUS:m exp:x                {: RESULT = new ExpNegate(loc(mxleft,xxright), x); :}  %prec UMINUS
 | LPAREN exp:x RPAREN          {: RESULT = x; :}
 | ID:f LPAREN exps:x RPAREN:r  {: RESULT = new ExpCall(loc(fxleft,rxright), f, x); :}
 ;

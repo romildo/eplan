@@ -65,6 +65,7 @@ litfloat1 = [0-9]+ "." [0-9]*
 litfloat2 = [0-9]* "." [0-9]+
 litfloat3 = ({litint} | {litfloat1} | {litfloat2}) [eE] [+-]? {litint}
 litreal   = {litint} | {litfloat1} | {litfloat2} | {litfloat3}
+litbool   = true | false
 
 id        = [a-zA-Z][a-zA-Z0-9_]*
 
@@ -74,6 +75,7 @@ id        = [a-zA-Z][a-zA-Z0-9_]*
 
 {litint}             { return tok(LITINT, yytext()); }
 {litreal}            { return tok(LITREAL, yytext()); }
+{litbool}            { return tok(LITBOOL, yytext()); }
 
 {id}                 { return tok(ID, yytext().intern()); }
 
