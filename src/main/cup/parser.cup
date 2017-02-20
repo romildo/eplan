@@ -54,7 +54,7 @@ non terminal List<Exp> exps, expsRest;
 start with program;
 
 program ::=
-  exp:e                  {: RESULT = e; :}
+  exp:e                        {: RESULT = e; :}
 ;
 
 exp ::=
