@@ -57,7 +57,7 @@ public class ExpCall extends Exp {
          Type t_par = parameters.head();
          // are the argument of the expected type?
          if (!t_arg.is(t_par))
-            typeMismatch(arg.loc, t_arg, t_par);
+            throw typeMismatch(arg.loc, t_arg, t_par);
          // advances to the next argument
          parameters = parameters.tail();
          arguments = arguments.tail();
