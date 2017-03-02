@@ -83,6 +83,8 @@ id        = [a-zA-Z][a-zA-Z0-9_]*
 "-"                  { return tok(MINUS); }
 "*"                  { return tok(TIMES); }
 "/"                  { return tok(DIV); }
+"&&"                 { return tok(AND); }
+"||"                 { return tok(OR); }
 "("                  { return tok(LPAREN); }
 ")"                  { return tok(RPAREN); }
 ","                  { return tok(COMMA); }
