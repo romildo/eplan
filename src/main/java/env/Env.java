@@ -23,6 +23,7 @@ public class Env {
     put(venv, "ceil",       new FUNCTION(INT.T, REAL.T));
     put(venv, "floor",      new FUNCTION(INT.T, REAL.T));
     put(venv, "real",       new FUNCTION(REAL.T, INT.T));
+    put(venv, "not",        new FUNCTION(BOOL.T, BOOL.T));
   }
 
   @Override
