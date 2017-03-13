@@ -75,4 +75,18 @@ public class SemantTest {
       trun("(print_int(23); 2.3)", REAL.T);
    }
 
+   @Test
+   public void testSimpleVariableAndLet() throws Exception {
+      erun("x",
+           "error.CompilerError: 1/1-1/2 undefined variable 'x'");
+      trun("let var x: int = 10 in x",
+           INT.T);
+      trun("let var x = 0.56 in x",
+           REAL.T);
+      erun("let var x: int = 3.4 in x",
+           "error.CompilerError: 1/18-1/21 type mismatch: found real but expected int");
+      erun("(let var x = 5 in print_int(x); x)",
+           "error.CompilerError: 1/33-1/34 undefined variable 'x'");
+   }
+
 }
