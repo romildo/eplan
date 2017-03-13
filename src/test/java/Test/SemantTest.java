@@ -45,4 +45,11 @@ public class SemantTest {
    @Rule
    public final JUnitSoftAssertions softly = new JUnitSoftAssertions();
 
+   @Test
+   public void testLiterals() throws Exception {
+      trun("true", BOOL.T);
+      trun("123", INT.T);
+      trun("12.34", REAL.T);
+   }
+
 }
