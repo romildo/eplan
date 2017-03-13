@@ -68,4 +68,11 @@ public class SemantTest {
            "error.CompilerError: 1/1-1/12 too few arguments in call to 'print_int'");
    }
 
+   @Test
+   public void testSequence() throws Exception {
+      trun("()", UNIT.T);
+      trun("(true)", BOOL.T);
+      trun("(print_int(23); 2.3)", REAL.T);
+   }
+
 }
