@@ -92,6 +92,7 @@ in                   { return tok(IN); }
 "("                  { return tok(LPAREN); }
 ")"                  { return tok(RPAREN); }
 ","                  { return tok(COMMA); }
+";"                  { return tok(SEMICOLON); }
 ":"                  { return tok(COLON); }
 "="                  { return tok(EQ); }
 
