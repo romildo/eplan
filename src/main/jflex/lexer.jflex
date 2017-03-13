@@ -78,6 +78,8 @@ id        = [a-zA-Z][a-zA-Z0-9_]*
 {litbool}            { return tok(LITBOOL, yytext()); }
 
 var                  { return tok(VAR); }
+let                  { return tok(LET); }
+in                   { return tok(IN); }
 
 {id}                 { return tok(ID, yytext().intern()); }
 

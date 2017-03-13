@@ -47,11 +47,13 @@ terminal        AND, OR;
 terminal        LPAREN, RPAREN;
 terminal        COMMA;
 terminal        VAR, EQ, COLON;
+terminal        LET, IN;
 
 non terminal Exp       program;
 non terminal Exp       exp;
 non terminal List<Exp> exps, expsRest;
 non terminal Dec       dec;
+non terminal List<Dec> decs;
 non terminal Var       var;
 
 precedence left OR;
@@ -80,6 +82,7 @@ exp ::=
 | LPAREN exp:x RPAREN          {: RESULT = x; :}
 | ID:f LPAREN exps:x RPAREN:r  {: RESULT = new ExpCall(loc(fxleft,rxright), f, x); :}
 | var:v                        {: RESULT = new ExpVar(loc(vxleft,vxright), v); :}
+| LET:l decs:ds IN exp:b       {: RESULT = new ExpLet(loc(lxleft,bxright), ds, b); :}
 ;
 
 exps ::=
@@ -95,6 +98,11 @@ expsRest ::=
 dec ::=
   VAR:v ID:x COLON ID:t EQ exp:e {: RESULT = new DecVar(loc(vxleft,exright), x, t, e); :}
 | VAR:v ID:x EQ exp:e            {: RESULT = new DecVar(loc(vxleft,exright), x, null, e); :}
+;
+
+decs ::=
+  dec:x                        {: RESULT = List.of(x); :}
+| dec:x decs:xs                {: RESULT = xs.prepend(x); :}
 ;
 
 var ::=
