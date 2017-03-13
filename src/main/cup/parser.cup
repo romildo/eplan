@@ -46,10 +46,12 @@ terminal        PLUS, MINUS, TIMES, DIV, UMINUS;
 terminal        AND, OR;
 terminal        LPAREN, RPAREN;
 terminal        COMMA;
+terminal        VAR, EQ, COLON;
 
 non terminal Exp       program;
 non terminal Exp       exp;
 non terminal List<Exp> exps, expsRest;
+non terminal Dec       dec;
 non terminal Var       var;
 
 precedence left OR;
@@ -88,6 +90,11 @@ exps ::=
 expsRest ::=
   /* empty */                  {: RESULT = List.empty(); :}
 | COMMA exp:x expsRest:xs      {: RESULT = xs.prepend(x); :}
+;
+
+dec ::=
+  VAR:v ID:x COLON ID:t EQ exp:e {: RESULT = new DecVar(loc(vxleft,exright), x, t, e); :}
+| VAR:v ID:x EQ exp:e            {: RESULT = new DecVar(loc(vxleft,exright), x, null, e); :}
 ;
 
 var ::=
