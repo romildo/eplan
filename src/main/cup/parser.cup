@@ -50,6 +50,7 @@ terminal        COMMA;
 non terminal Exp       program;
 non terminal Exp       exp;
 non terminal List<Exp> exps, expsRest;
+non terminal Var       var;
 
 precedence left OR;
 precedence left AND;
@@ -76,6 +77,7 @@ exp ::=
 | MINUS:m exp:x                {: RESULT = new ExpNegate(loc(mxleft,xxright), x); :}  %prec UMINUS
 | LPAREN exp:x RPAREN          {: RESULT = x; :}
 | ID:f LPAREN exps:x RPAREN:r  {: RESULT = new ExpCall(loc(fxleft,rxright), f, x); :}
+| var:v                        {: RESULT = new ExpVar(loc(vxleft,vxright), v); :}
 ;
 
 exps ::=
@@ -86,4 +88,8 @@ exps ::=
 expsRest ::=
   /* empty */                  {: RESULT = List.empty(); :}
 | COMMA exp:x expsRest:xs      {: RESULT = xs.prepend(x); :}
+;
+
+var ::=
+  ID:v                         {: RESULT = new VarSimple(loc(vxleft,vxright), v); :}
 ;
