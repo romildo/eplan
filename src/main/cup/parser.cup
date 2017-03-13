@@ -45,11 +45,17 @@ terminal String ID;
 terminal        PLUS, MINUS, TIMES, DIV, UMINUS;
 terminal        AND, OR;
 terminal        LPAREN, RPAREN;
-terminal        COMMA;
+terminal        COMMA, SEMICOLON;
+terminal        VAR, EQ, COLON;
+terminal        LET, IN;
 
 non terminal Exp       program;
 non terminal Exp       exp;
 non terminal List<Exp> exps, expsRest;
+non terminal List<Exp> expseq, expseqRest;
+non terminal Dec       dec;
+non terminal List<Dec> decs;
+non terminal Var       var;
 
 precedence left OR;
 precedence left AND;
@@ -74,8 +80,10 @@ exp ::=
 | LITREAL:x                    {: RESULT = new ExpReal(loc(xxleft,xxright), x); :}
 | LITBOOL:x                    {: RESULT = new ExpBool(loc(xxleft,xxright), x); :}
 | MINUS:m exp:x                {: RESULT = new ExpNegate(loc(mxleft,xxright), x); :}  %prec UMINUS
-| LPAREN exp:x RPAREN          {: RESULT = x; :}
 | ID:f LPAREN exps:x RPAREN:r  {: RESULT = new ExpCall(loc(fxleft,rxright), f, x); :}
+| var:v                        {: RESULT = new ExpVar(loc(vxleft,vxright), v); :}
+| LET:l decs:ds IN exp:b       {: RESULT = new ExpLet(loc(lxleft,bxright), ds, b); :}
+| LPAREN:l expseq:es RPAREN:r  {: RESULT = new ExpSeq(loc(lxleft,rxright), es); :}
 ;
 
 exps ::=
@@ -86,4 +94,28 @@ exps ::=
 expsRest ::=
   /* empty */                  {: RESULT = List.empty(); :}
 | COMMA exp:x expsRest:xs      {: RESULT = xs.prepend(x); :}
+;
+
+expseq ::=
+  /* empty */                  {: RESULT = List.empty(); :}
+| exp:x expseqRest:xs          {: RESULT = xs.prepend(x); :}
+;
+
+expseqRest ::=
+  /* empty */                   {: RESULT = List.empty(); :}
+| SEMICOLON exp:x expseqRest:xs {: RESULT = xs.prepend(x); :}
+;
+
+dec ::=
+  VAR:v ID:x COLON ID:t EQ exp:e {: RESULT = new DecVar(loc(vxleft,exright), x, t, e); :}
+| VAR:v ID:x EQ exp:e            {: RESULT = new DecVar(loc(vxleft,exright), x, null, e); :}
+;
+
+decs ::=
+  dec:x                        {: RESULT = List.of(x); :}
+| dec:x decs:xs                {: RESULT = xs.prepend(x); :}
+;
+
+var ::=
+  ID:v                         {: RESULT = new VarSimple(loc(vxleft,vxright), v); :}
 ;

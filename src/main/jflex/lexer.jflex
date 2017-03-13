@@ -77,6 +77,10 @@ id        = [a-zA-Z][a-zA-Z0-9_]*
 {litreal}            { return tok(LITREAL, yytext()); }
 {litbool}            { return tok(LITBOOL, yytext()); }
 
+var                  { return tok(VAR); }
+let                  { return tok(LET); }
+in                   { return tok(IN); }
+
 {id}                 { return tok(ID, yytext().intern()); }
 
 "+"                  { return tok(PLUS); }
@@ -88,5 +92,8 @@ id        = [a-zA-Z][a-zA-Z0-9_]*
 "("                  { return tok(LPAREN); }
 ")"                  { return tok(RPAREN); }
 ","                  { return tok(COMMA); }
+";"                  { return tok(SEMICOLON); }
+":"                  { return tok(COLON); }
+"="                  { return tok(EQ); }
 
 .                    { throw error(Loc.loc(locLeft()), "unexpected char '%s'", yytext()); }

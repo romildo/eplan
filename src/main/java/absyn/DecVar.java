@@ -1,6 +1,7 @@
 package absyn;
 
 import env.Env;
+import javaslang.collection.List;
 import javaslang.collection.Tree;
 import parse.Loc;
 import semantic.SemanticHelper;
@@ -21,10 +22,11 @@ public class DecVar extends Dec {
 
    @Override
    public Tree.Node<String> toTree() {
-      return Tree.of("DecVar",
-                     Tree.of(name),
-                     Tree.of(typeName),
-                     init.toTree());
+      List<Tree.Node<String>> children = List.of(Tree.of(name));
+      if (typeName != null)
+         children = children.append(Tree.of(typeName));
+      children = children.append(init.toTree());
+      return Tree.of("DecVar", children);
    }
 
    @Override
