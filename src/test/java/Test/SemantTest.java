@@ -52,4 +52,20 @@ public class SemantTest {
       trun("12.34", REAL.T);
    }
 
+   @Test
+   public void testFunctionCall() throws Exception {
+      erun("fat(9)",
+           "error.CompilerError: 1/1-1/7 undefined function 'fat'");
+      erun("fat(g(), h())",
+           "error.CompilerError: 1/5-1/8 undefined function 'g'");
+      trun("print_int(123)",
+           UNIT.T);
+      erun("print_int(true)",
+           "error.CompilerError: 1/11-1/15 type mismatch: found bool but expected int");
+      erun("print_int(123, true, f())",
+           "error.CompilerError: 1/22-1/25 undefined function 'f'");
+      erun("print_int()",
+           "error.CompilerError: 1/1-1/12 too few arguments in call to 'print_int'");
+   }
+
 }
