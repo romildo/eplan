@@ -48,6 +48,8 @@ terminal        LPAREN, RPAREN;
 terminal        COMMA, SEMICOLON;
 terminal        VAR, EQ, COLON;
 terminal        LET, IN;
+terminal        ASSIGN;
+terminal        IF, THEN, ELSE;
 
 non terminal Exp       program;
 non terminal Exp       exp;
@@ -62,6 +64,7 @@ precedence left AND;
 precedence left PLUS, MINUS;
 precedence left TIMES, DIV;
 precedence left UMINUS;
+precedence right ASSIGN;
 
 start with program;
 
@@ -84,6 +87,9 @@ exp ::=
 | var:v                        {: RESULT = new ExpVar(loc(vxleft,vxright), v); :}
 | LET:l decs:ds IN exp:b       {: RESULT = new ExpLet(loc(lxleft,bxright), ds, b); :}
 | LPAREN:l expseq:es RPAREN:r  {: RESULT = new ExpSeq(loc(lxleft,rxright), es); :}
+| var:v ASSIGN exp:e           {: RESULT = new ExpAssign(loc(vxleft,exright), v, e); :}
+| IF:i exp:c THEN exp:t        {: RESULT = new ExpIf(loc(ixleft,txright), c, t, null); :}
+| IF:i exp:c THEN exp:t ELSE exp:e  {: RESULT = new ExpIf(loc(ixleft,exright), c, t, e); :}
 ;
 
 exps ::=

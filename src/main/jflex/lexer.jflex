@@ -80,6 +80,9 @@ id        = [a-zA-Z][a-zA-Z0-9_]*
 var                  { return tok(VAR); }
 let                  { return tok(LET); }
 in                   { return tok(IN); }
+if                   { return tok(IF); }
+then                 { return tok(THEN); }
+else                 { return tok(ELSE); }
 
 {id}                 { return tok(ID, yytext().intern()); }
 
@@ -95,5 +98,5 @@ in                   { return tok(IN); }
 ";"                  { return tok(SEMICOLON); }
 ":"                  { return tok(COLON); }
 "="                  { return tok(EQ); }
-
+":="                 { return tok(ASSIGN); }
 .                    { throw error(Loc.loc(locLeft()), "unexpected char '%s'", yytext()); }
