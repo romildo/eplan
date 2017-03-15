@@ -46,8 +46,9 @@ terminal        PLUS, MINUS, TIMES, DIV, UMINUS;
 terminal        AND, OR;
 terminal        LPAREN, RPAREN;
 terminal        COMMA, SEMICOLON;
-terminal        VAR, EQ, COLON;
+terminal        VAR, EQ, COLON, ATTR;
 terminal        LET, IN;
+terminal        IF, THEN, ELSE;
 
 non terminal Exp       program;
 non terminal Exp       exp;
@@ -62,6 +63,7 @@ precedence left AND;
 precedence left PLUS, MINUS;
 precedence left TIMES, DIV;
 precedence left UMINUS;
+precedence left ATTR;
 
 start with program;
 
@@ -70,20 +72,23 @@ program ::=
 ;
 
 exp ::=
-  exp:x PLUS exp:y             {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.PLUS, x, y); :}
-| exp:x MINUS exp:y            {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.MINUS, x, y); :}
-| exp:x TIMES exp:y            {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.TIMES, x, y); :}
-| exp:x DIV exp:y              {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.DIV, x, y); :}
-| exp:x AND exp:y              {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.AND, x, y); :}
-| exp:x OR exp:y               {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.OR, x, y); :}
-| LITINT:x                     {: RESULT = new ExpInt(loc(xxleft,xxright), x); :}
-| LITREAL:x                    {: RESULT = new ExpReal(loc(xxleft,xxright), x); :}
-| LITBOOL:x                    {: RESULT = new ExpBool(loc(xxleft,xxright), x); :}
-| MINUS:m exp:x                {: RESULT = new ExpNegate(loc(mxleft,xxright), x); :}  %prec UMINUS
-| ID:f LPAREN exps:x RPAREN:r  {: RESULT = new ExpCall(loc(fxleft,rxright), f, x); :}
-| var:v                        {: RESULT = new ExpVar(loc(vxleft,vxright), v); :}
-| LET:l decs:ds IN exp:b       {: RESULT = new ExpLet(loc(lxleft,bxright), ds, b); :}
-| LPAREN:l expseq:es RPAREN:r  {: RESULT = new ExpSeq(loc(lxleft,rxright), es); :}
+  exp:x PLUS exp:y                  {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.PLUS, x, y); :}
+| exp:x MINUS exp:y                 {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.MINUS, x, y); :}
+| exp:x TIMES exp:y                 {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.TIMES, x, y); :}
+| exp:x DIV exp:y                   {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.DIV, x, y); :}
+| exp:x AND exp:y                   {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.AND, x, y); :}
+| exp:x OR exp:y                    {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.OR, x, y); :}
+| LITINT:x                          {: RESULT = new ExpInt(loc(xxleft,xxright), x); :}
+| LITREAL:x                         {: RESULT = new ExpReal(loc(xxleft,xxright), x); :}
+| LITBOOL:x                         {: RESULT = new ExpBool(loc(xxleft,xxright), x); :}
+| MINUS:m exp:x                     {: RESULT = new ExpNegate(loc(mxleft,xxright), x); :}  %prec UMINUS
+| ID:f LPAREN exps:x RPAREN:r       {: RESULT = new ExpCall(loc(fxleft,rxright), f, x); :}
+| var:v                             {: RESULT = new ExpVar(loc(vxleft,vxright), v); :}
+| LET:l decs:ds IN exp:b            {: RESULT = new ExpLet(loc(lxleft,bxright), ds, b); :}
+| LPAREN:l expseq:es RPAREN:r       {: RESULT = new ExpSeq(loc(lxleft,rxright), es); :}
+| var:v ATTR exp:y                  {: RESULT = new ExpAssign(loc(vxleft,yxright), v, y); :}
+| IF:i exp:x THEN exp:y             {: RESULT = new ExpIf(loc(ixleft,yxright), x, y, null); :}
+| IF:i exp:x THEN exp:y ELSE exp:z  {: RESULT = new ExpIf(loc(ixleft,yxright), x, y, z); :}
 ;
 
 exps ::=
