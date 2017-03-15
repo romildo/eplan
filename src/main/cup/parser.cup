@@ -48,6 +48,7 @@ terminal        LPAREN, RPAREN;
 terminal        COMMA, SEMICOLON;
 terminal        VAR, EQ, COLON;
 terminal        LET, IN;
+terminal        ASSIGN;
 
 non terminal Exp       program;
 non terminal Exp       exp;
@@ -84,6 +85,7 @@ exp ::=
 | var:v                        {: RESULT = new ExpVar(loc(vxleft,vxright), v); :}
 | LET:l decs:ds IN exp:b       {: RESULT = new ExpLet(loc(lxleft,bxright), ds, b); :}
 | LPAREN:l expseq:es RPAREN:r  {: RESULT = new ExpSeq(loc(lxleft,rxright), es); :}
+| var:v ASSIGN exp:x           {: RESULT = new ExpAssign(loc(vxleft, xxright), v, x); :}
 ;
 
 exps ::=

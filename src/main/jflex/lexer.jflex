@@ -95,5 +95,5 @@ in                   { return tok(IN); }
 ";"                  { return tok(SEMICOLON); }
 ":"                  { return tok(COLON); }
 "="                  { return tok(EQ); }
-
+":="                 { return tok(ASSIGN); }
 .                    { throw error(Loc.loc(locLeft()), "unexpected char '%s'", yytext()); }
