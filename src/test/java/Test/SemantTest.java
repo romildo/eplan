@@ -89,4 +89,21 @@ public class SemantTest {
            "error.CompilerError: 1/33-1/34 undefined variable 'x'");
    }
 
+   @Test
+   public void testExpressionOfAssign() throws IOException {
+      trun("let var a : int = 10 in a := 5", INT.T);
+      trun("let var a = 100.8 in a := 5 * 43.56", REAL.T);
+      erun("let var a = 10 in a := 5 * 43.56", "error.CompilerError: 1/24-1/33 type mismatch: found real but expected int");
+      trun("let var a = false in a := true || false", BOOL.T);
+      erun("let var a = 10 in a := true", "error.CompilerError: 1/24-1/28 type mismatch: found bool but expected int");
+   }
+
+   @Test
+   public void testExpressionIf() throws IOException {
+      trun("if false then () else ()", UNIT.T);
+      trun("if true then 57*3.14 else 10.4", REAL.T);
+      trun("if true || false then true else false", BOOL.T);
+      erun("if 4.234 then true else false", "error.CompilerError: 1/4-1/9 type mismatch: found real but expected bool");
+      erun("if false then 57*3.14 else false", "error.CompilerError: 1/28-1/33 type mismatch: found bool but expected real");
+   }
 }
