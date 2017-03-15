@@ -89,4 +89,12 @@ public class SemantTest {
            "error.CompilerError: 1/33-1/34 undefined variable 'x'");
    }
 
+   @Test
+   public void testAssignment() throws Exception {
+      trun("let var x: int = 10 in x := 2*x + 1",
+           INT.T);
+      erun("let var x: int = 10 in x := true",
+           "error.CompilerError: 1/29-1/33 type mismatch: found bool but expected int");
+   }
+
 }
