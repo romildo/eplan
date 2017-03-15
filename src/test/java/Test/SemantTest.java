@@ -97,4 +97,20 @@ public class SemantTest {
            "error.CompilerError: 1/29-1/33 type mismatch: found bool but expected int");
    }
 
+   @Test
+   public void testIf() throws Exception {
+      trun("if true then print_int(2)",
+           UNIT.T);
+      trun("if true then 2 else 3",
+           INT.T);
+      trun("if true then if false then print_real(1.1) else print_real(1.2)",
+           UNIT.T);
+      erun("if 5 then 2 else 3",
+           "error.CompilerError: 1/4-1/5 type mismatch: found int but expected bool");
+      erun("if true then 2 else false",
+           "error.CompilerError: 1/21-1/26 type mismatch: found bool but expected int");
+      erun("if true then 3.5",
+           "error.CompilerError: 1/14-1/17 type mismatch: found real but expected unit");
+   }
+
 }
