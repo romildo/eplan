@@ -2,11 +2,10 @@ package absyn;
 
 import env.Env;
 import parse.Loc;
-import types.Type;
 
-public abstract class Dec extends AST {
+public abstract class Ty extends AST {
 
-   public Dec(Loc loc) {
+   public Ty(Loc loc) {
       super(loc);
    }
 

@@ -50,14 +50,19 @@ terminal        VAR, EQ, COLON;
 terminal        LET, IN;
 terminal        ASSIGN;
 terminal        IF, THEN, ELSE;
+terminal        TYPE;
 
 non terminal Exp       program;
 non terminal Exp       exp;
 non terminal List<Exp> exps, expsRest;
 non terminal List<Exp> expseq, expseqRest;
-non terminal Dec       dec;
+non terminal DecVar    decvar;
+non terminal DecType   dectype;
+non terminal List<DecType> dectypes;
 non terminal List<Dec> decs;
+non terminal List<Dec> decs_beg_with_variable, decs_beg_with_type;
 non terminal Var       var;
+non terminal Ty        ty;
 
 precedence left OR;
 precedence left AND;
@@ -112,16 +117,40 @@ expseqRest ::=
 | SEMICOLON exp:x expseqRest:xs {: RESULT = xs.prepend(x); :}
 ;
 
-dec ::=
+decvar ::=
   VAR:v ID:x COLON ID:t EQ exp:e {: RESULT = new DecVar(loc(vxleft,exright), x, t, e); :}
 | VAR:v ID:x EQ exp:e            {: RESULT = new DecVar(loc(vxleft,exright), x, null, e); :}
 ;
 
+dectype ::=
+  TYPE:t ID:id EQ ty:ty          {: RESULT = new DecType(loc(txleft,tyxright), id,ty); :}
+;
+
+dectypes ::=
+  dectype:d                      {: RESULT = List.of(d); :}
+| dectype:d dectypes:ds          {: RESULT = ds.prepend(d); :}
+;
+
 decs ::=
-  dec:x                        {: RESULT = List.of(x); :}
-| dec:x decs:xs                {: RESULT = xs.prepend(x); :}
+  decs_beg_with_variable:ds    {: RESULT = ds; :}
+| decs_beg_with_type:ds        {: RESULT = ds; :}
+;
+
+decs_beg_with_variable ::=
+  decvar:d                           {: RESULT = List.of(d); :}
+| decvar:d decs_beg_with_variable:ds {: RESULT = ds.prepend(d); :}
+| decvar:d decs_beg_with_type:ds     {: RESULT = ds.prepend(d); :}
+;
+
+decs_beg_with_type ::=
+  dectypes:dt                           {: RESULT = List.of(new DecTypeMutual(loc(dtxleft,dtxright), dt)); :}
+| dectypes:dt decs_beg_with_variable:ds {: RESULT = ds.prepend(new DecTypeMutual(loc(dtxleft,dtxright), dt)); :}
 ;
 
 var ::=
   ID:v                         {: RESULT = new VarSimple(loc(vxleft,vxright), v); :}
+;
+
+ty ::=
+  ID:id                       {: RESULT = new TyName(loc(idxleft,idxright), id); :}
 ;
