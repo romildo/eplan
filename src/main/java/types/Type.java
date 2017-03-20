@@ -19,11 +19,15 @@ public abstract class Type implements ToTree<String> {
       return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
    }
 
+   public Type actual(){
+      return this;
+   }
+
    // Verify if this type can be coerced to the given type. In
    // general one type can be coerced to another type if and only if the
    // types are the same.
    public boolean is(Type type) {
-      return type == this;
+      return type.actual() == this;
    }
 
    // Verify if this type can be coerced to any of the given types.
