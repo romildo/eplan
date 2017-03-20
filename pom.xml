@@ -97,6 +97,7 @@
                <symbolsInterface>true</symbolsInterface>
                <!-- Makes CUP generate xleft/xright handles for accessing Location objects for symbol start/end inside actions. -->
                <locations>true</locations>
+               <expectedConflicts>1</expectedConflicts>
             </configuration>
          </plugin>
 
