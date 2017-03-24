@@ -1,7 +1,6 @@
 package absyn;
 
 import env.Env;
-import error.ErrorHelper;
 import javaslang.collection.Tree;
 import parse.Loc;
 import types.BOOL;

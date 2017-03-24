@@ -51,6 +51,7 @@ terminal        LET, IN;
 terminal        ASSIGN;
 terminal        IF, THEN, ELSE;
 terminal        TYPE;
+terminal        FUNCTION;
 
 non terminal Exp       program;
 non terminal Exp       exp;
@@ -60,9 +61,13 @@ non terminal DecVar    decvar;
 non terminal DecType   dectype;
 non terminal List<DecType> dectypes;
 non terminal List<Dec> decs;
-non terminal List<Dec> decs_beg_with_variable, decs_beg_with_type;
+non terminal List<Dec> decs_beg_with_variable, decs_beg_with_type, decs_beg_with_function;
 non terminal Var       var;
 non terminal Ty        ty;
+non terminal List<Param> params;
+non terminal Param     param;
+non terminal DecFunction decfunction;
+non terminal List<DecFunction> decfunctions;
 
 precedence left OR;
 precedence left AND;
@@ -134,17 +139,35 @@ dectypes ::=
 decs ::=
   decs_beg_with_variable:ds    {: RESULT = ds; :}
 | decs_beg_with_type:ds        {: RESULT = ds; :}
+| decs_beg_with_function:ds    {: RESULT = ds; :}
 ;
 
 decs_beg_with_variable ::=
   decvar:d                           {: RESULT = List.of(d); :}
 | decvar:d decs_beg_with_variable:ds {: RESULT = ds.prepend(d); :}
 | decvar:d decs_beg_with_type:ds     {: RESULT = ds.prepend(d); :}
+| decvar:d decs_beg_with_function:ds {: RESULT = ds.prepend(d); :}
+;
+
+decs_beg_with_function ::=
+  decfunctions:d                           {: RESULT = List.of(new DecFunctionMutual(loc(dxleft,dxright), d)); :}
+| decfunctions:d decs_beg_with_variable:ds {: RESULT = ds.prepend(new DecFunctionMutual(loc(dxleft,dxright), d)); :}
+| decfunctions:d decs_beg_with_type:ds     {: RESULT = ds.prepend(new DecFunctionMutual(loc(dxleft,dxright), d)); :}
+;
+
+decfunctions::=
+  decfunction:d                 {: RESULT = List.of(d); :}
+| decfunction:d decfunctions:ds {: RESULT = ds.prepend(d); :}
+;
+
+decfunction ::=
+  FUNCTION:f ID:id LPAREN params:p RPAREN COLON ID:r EQ exp:e {: RESULT = new DecFunction(loc(fxleft,exright), id, p, r, e); :}
 ;
 
 decs_beg_with_type ::=
   dectypes:dt                           {: RESULT = List.of(new DecTypeMutual(loc(dtxleft,dtxright), dt)); :}
 | dectypes:dt decs_beg_with_variable:ds {: RESULT = ds.prepend(new DecTypeMutual(loc(dtxleft,dtxright), dt)); :}
+| dectypes:dt decs_beg_with_function:ds {: RESULT = ds.prepend(new DecTypeMutual(loc(dtxleft,dtxright), dt)); :}
 ;
 
 var ::=
@@ -153,4 +176,13 @@ var ::=
 
 ty ::=
   ID:id                       {: RESULT = new TyName(loc(idxleft,idxright), id); :}
+;
+
+param ::=
+  ID:id COLON ID:type          {: RESULT = new Param(loc(idxleft,typexright),id,type); :}
+;
+
+params ::=
+  param:p                       {: RESULT = List.of(p); :}
+| param:p COMMA params:ds       {: RESULT = ds.prepend(p); :}
 ;

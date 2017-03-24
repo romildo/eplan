@@ -84,6 +84,7 @@ in                   { return tok(IN); }
 if                   { return tok(IF); }
 then                 { return tok(THEN); }
 else                 { return tok(ELSE); }
+function             { return tok(FUNCTION); }
 
 {id}                 { return tok(ID, yytext().intern()); }
 
