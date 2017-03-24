@@ -3,7 +3,7 @@ package types;
 import javaslang.collection.Tree;
 
 public class NAME extends Type {
-
+  
     public final String name;
     public Type binding;
 

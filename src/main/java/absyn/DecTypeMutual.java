@@ -5,6 +5,7 @@ import error.CompilerError;
 import javaslang.collection.List;
 import javaslang.collection.Tree;
 import parse.Loc;
+import semantic.SemanticHelper;
 import types.NAME;
 import types.Type;
 
