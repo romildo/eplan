@@ -44,6 +44,7 @@ terminal String LITBOOL;
 terminal String ID;
 terminal        PLUS, MINUS, TIMES, DIV, UMINUS;
 terminal        AND, OR;
+terminal        LESS, LESSEG, MORE, MOREEG, EQUALS, DIF;
 terminal        LPAREN, RPAREN;
 terminal        COMMA, SEMICOLON;
 terminal        VAR, EQ, COLON;
@@ -51,6 +52,8 @@ terminal        LET, IN;
 terminal        ASSIGN;
 terminal        IF, THEN, ELSE;
 terminal        TYPE;
+terminal        BREAK;
+terminal        WHILE, DO;
 
 non terminal Exp       program;
 non terminal Exp       exp;
@@ -64,8 +67,10 @@ non terminal List<Dec> decs_beg_with_variable, decs_beg_with_type;
 non terminal Var       var;
 non terminal Ty        ty;
 
+precedence left EQUALS, DIF;
 precedence left OR;
 precedence left AND;
+precedence left LESS, LESSEG, MORE, MOREEG;
 precedence left PLUS, MINUS;
 precedence left TIMES, DIV;
 precedence left UMINUS;
@@ -84,6 +89,12 @@ exp ::=
 | exp:x DIV exp:y                  {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.DIV, x, y); :}
 | exp:x AND exp:y                  {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.AND, x, y); :}
 | exp:x OR exp:y                   {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.OR, x, y); :}
+| exp:x LESS exp:y                 {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.LESS, x, y); :}
+| exp:x LESSEG exp:y               {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.LESSEG, x, y); :}
+| exp:x MORE exp:y                 {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.MORE, x, y); :}
+| exp:x MOREEG exp:y               {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.MOREEG, x, y); :}
+| exp:x EQUALS exp:y               {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.EQUALS, x, y); :}
+| exp:x DIF exp:y                  {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.DIF, x, y); :}
 | LITINT:x                         {: RESULT = new ExpInt(loc(xxleft,xxright), x); :}
 | LITREAL:x                        {: RESULT = new ExpReal(loc(xxleft,xxright), x); :}
 | LITBOOL:x                        {: RESULT = new ExpBool(loc(xxleft,xxright), x); :}
@@ -95,6 +106,8 @@ exp ::=
 | LPAREN:l expseq:es RPAREN:r      {: RESULT = new ExpSeq(loc(lxleft,rxright), es); :}
 | IF:i exp:t THEN exp:a ELSE exp:b {: RESULT = new ExpIf(loc(ixleft,bxright), t, a, b); :}
 | IF:i exp:t THEN exp:a            {: RESULT = new ExpIf(loc(ixleft,axright), t, a, null); :}
+| BREAK:x                          {: RESULT = new ExpBreak(loc(xxleft,xxright)); :}
+| WHILE:i exp:t DO exp:a           {: RESULT = new ExpWhile(loc(ixleft,axright), t, a); :}
 ;
 
 exps ::=

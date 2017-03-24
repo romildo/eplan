@@ -7,6 +7,8 @@ public class Env {
   public Table<Type> tenv;
   public Table<Type> venv;
 
+  public boolean isWhile;
+
   public Env() {
     tenv = new Table<Type>();
     put(tenv, "unit", UNIT.T);
@@ -24,6 +26,8 @@ public class Env {
     put(venv, "floor",      new FUNCTION(INT.T, REAL.T));
     put(venv, "real",       new FUNCTION(REAL.T, INT.T));
     put(venv, "not",        new FUNCTION(BOOL.T, BOOL.T));
+
+    this.isWhile=false;
   }
 
   @Override
