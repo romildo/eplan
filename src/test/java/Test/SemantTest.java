@@ -28,7 +28,7 @@ public class SemantTest {
       try {
          softly.assertThat(runSemantic(input))
                .as("%s", input)
-               .isEqualTo(type);
+               .matches(t -> t.is(type));
       }
       catch (Exception e) {
          e.printStackTrace();
@@ -56,14 +56,19 @@ public class SemantTest {
    public void testFunctionCall() throws Exception {
       erun("fat(9)",
            "error.CompilerError: 1/1-1/7 undefined function 'fat'");
+
       erun("fat(g(), h())",
            "error.CompilerError: 1/5-1/8 undefined function 'g'");
+
       trun("print_int(123)",
            UNIT.T);
+
       erun("print_int(true)",
            "error.CompilerError: 1/11-1/15 type mismatch: found bool but expected int");
+
       erun("print_int(123, true, f())",
            "error.CompilerError: 1/22-1/25 undefined function 'f'");
+
       erun("print_int()",
            "error.CompilerError: 1/1-1/12 too few arguments in call to 'print_int'");
    }
@@ -79,38 +84,115 @@ public class SemantTest {
    public void testSimpleVariableAndLet() throws Exception {
       erun("x",
            "error.CompilerError: 1/1-1/2 undefined variable 'x'");
-      trun("let var x: int = 10 in x",
+
+      erun("round",
+           "error.CompilerError: 1/1-1/6 function 'round' used as variable");
+
+      trun("let\n" +
+           "  var x: int = 10\n" +
+           "in\n" +
+           "  x",
            INT.T);
-      trun("let var x = 0.56 in x",
+
+      trun("let\n" +
+           "  var x = 0.56\n" +
+           "in\n" +
+           "  x",
            REAL.T);
-      erun("let var x: int = 3.4 in x",
-           "error.CompilerError: 1/18-1/21 type mismatch: found real but expected int");
-      erun("(let var x = 5 in print_int(x); x)",
-           "error.CompilerError: 1/33-1/34 undefined variable 'x'");
+
+      erun("let\n" +
+           "  var x: int = 3.4\n" +
+           "in\n" +
+           "  x",
+           "error.CompilerError: 2/16-2/19 type mismatch: found real but expected int");
+
+      erun("( let var x = 5 in print_int(x);\n" +
+           "  x\n" +
+           ")",
+           "error.CompilerError: 2/3-2/4 undefined variable 'x'");
    }
 
    @Test
    public void testAssignment() throws Exception {
-      trun("let var x: int = 10 in x := 2*x + 1",
+      trun("let\n" +
+           "  var x: int = 10\n" +
+           "in\n" +
+           "  x := 2*x + 1",
            INT.T);
-      erun("let var x: int = 10 in x := true",
-           "error.CompilerError: 1/29-1/33 type mismatch: found bool but expected int");
+
+      erun("let\n" +
+           "  var x: int = 10\n" +
+           "in\n" +
+           "  x := true",
+           "error.CompilerError: 4/8-4/12 type mismatch: found bool but expected int");
    }
 
    @Test
    public void testIf() throws Exception {
       trun("if true then print_int(2)",
            UNIT.T);
+
       trun("if true then 2 else 3",
            INT.T);
-      trun("if true then if false then print_real(1.1) else print_real(1.2)",
+
+      trun("if true then\n" +
+           "  if false then\n" +
+           "    print_real(1.1)\n" +
+           "  else\n" +
+           "    print_real(1.2)",
            UNIT.T);
+
       erun("if 5 then 2 else 3",
            "error.CompilerError: 1/4-1/5 type mismatch: found int but expected bool");
+
       erun("if true then 2 else false",
            "error.CompilerError: 1/21-1/26 type mismatch: found bool but expected int");
+
       erun("if true then 3.5",
            "error.CompilerError: 1/14-1/17 type mismatch: found real but expected unit");
+   }
+
+   @Test
+   public void testTypeDeclaration() throws Exception {
+      trun("let\n" +
+           "  type t1 = int\n" +
+           "  var x : t1 = 3\n" +
+           "in\n" +
+           "  x + 1",
+           INT.T);
+
+      erun("let\n" +
+           "  type t1 = inteiro\n" +
+           "  var x : t1 = 3\n" +
+           "in\n" +
+           "  print_int(x)",
+           "error.CompilerError: 2/13-2/20 undefined type 'inteiro'");
+
+      trun("let\n" +
+           "  type t1 = int\n" +
+           "  type t2 = real\n" +
+           "  var x : t1 = 3\n" +
+           "  var y : t2 = 2.7\n" +
+           "in\n" +
+           "  round(y) + x",
+           INT.T);
+
+      trun("let\n" +
+           "  type t1 = t2\n" +
+           "  type t2 = real\n" +
+           "  var x : t1 = 3.5\n" +
+           "in\n" +
+           "  x",
+           REAL.T);
+
+      erun("let\n" +
+           "  type t1 = t2\n" +
+           "  var x : t1 = 3.5\n" +
+           "  type t2 = real\n" +
+           "in\n" +
+           "  x",
+           "error.CompilerError: 2/13-2/15 undefined type 't2'");
+
    }
 
 }
