@@ -28,7 +28,7 @@ public class SemantTest {
       try {
          softly.assertThat(runSemantic(input))
                .as("%s", input)
-               .isEqualTo(type);
+               .matches(t -> t.is(type));
       }
       catch (Exception e) {
          e.printStackTrace();
@@ -111,6 +111,54 @@ public class SemantTest {
            "error.CompilerError: 1/21-1/26 type mismatch: found bool but expected int");
       erun("if true then 3.5",
            "error.CompilerError: 1/14-1/17 type mismatch: found real but expected unit");
+   }
+
+   @Test
+   public void testTypeDeclaration() throws Exception {
+      trun("let\n" +
+           "  type t1 = int\n" +
+           "  var x : t1 = 3\n" +
+           "in\n" +
+           "  x + 1\n" +
+           "",
+           INT.T);
+
+      erun("let\n" +
+           "  type t1 = inteiro\n" +
+           "  var x : t1 = 3\n" +
+           "in\n" +
+           "  print_int(x)\n" +
+           "",
+           "error.CompilerError: 2/13-2/20 undefined type 'inteiro'");
+
+      trun("let\n" +
+           "  type t1 = int\n" +
+           "  type t2 = real\n" +
+           "  var x : t1 = 3\n" +
+           "  var y : t2 = 2.7\n" +
+           "in\n" +
+           "  round(y) + x\n" +
+           "",
+           INT.T);
+
+      trun("let\n" +
+           "  type t1 = t2\n" +
+           "  type t2 = real\n" +
+           "  var x : t1 = 3.5\n" +
+           "in\n" +
+           "  x\n" +
+           "",
+           REAL.T);
+
+      erun("let\n" +
+           "  type t1 = t2\n" +
+           "  var x : t1 = 3.5\n" +
+           "  type t2 = real\n" +
+           "in\n" +
+           "  x\n" +
+           "",
+           "error.CompilerError: 2/13-2/15 undefined type 't2'");
+
    }
 
 }
