@@ -4,43 +4,30 @@ import env.Env;
 import javaslang.collection.List;
 import javaslang.collection.Tree;
 import parse.Loc;
-import semantic.SemanticHelper;
 import types.Type;
 
-public class DecVar extends Dec {
+public class DecFunction extends AST {
 
-   public final String name;
-   public final String typeName;
-   public final Exp init;
+    public final String name;
+    public final List<Parameter> parameters;
+    public final String typeName;
+    public final Exp body;
 
-   public DecVar(Loc loc, String name, String typeName, Exp init) {
-      super(loc);
-      this.name = name;
-      this.typeName = typeName;
-      this.init = init;
-   }
+    public DecFunction(Loc loc, String name, List parameters, String typeName, Exp body) {
+        super(loc);
+        this.name = name;
+        this.parameters = parameters;
+        this.typeName = typeName;
+        this.body = body;
+    }
 
-   @Override
-   public Tree.Node<String> toTree() {
-      List<Tree.Node<String>> children = List.of(Tree.of(name));
-      if (typeName != null)
-         children = children.append(Tree.of(typeName));
-      children = children.append(init.toTree());
-      return Tree.of("DecVar", children);
-   }
+    @Override
+    public Tree.Node<String> toTree() {
+        return Tree.of("DecFunction: " + name,
+                Tree.of("Parameters", parameters.map(Parameter::toTree)),
+                Tree.of(typeName == null ? "" : typeName),
+                body.toTree()
+        );
+    }
 
-   @Override
-   public void semantic(Env env) {
-      Type t_init = init.semantic(env);
-      Type t_var = t_init;
-      if (typeName != null) {
-         Type t_typeName = env.tenv.get(typeName);
-         if (t_typeName == null)
-            throw SemanticHelper.undefined(loc, "type", typeName);
-         if (!t_init.is(t_typeName))
-            throw SemanticHelper.typeMismatch(init.loc, t_init, t_typeName);
-         t_var = t_typeName;
-      }
-      env.venv.put(name, t_var);
-   }
 }

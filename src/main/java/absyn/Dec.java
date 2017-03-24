@@ -11,6 +11,6 @@ public abstract class Dec extends AST {
    }
 
    // Do semantic analysis of the declaraction
-   public abstract void semantic(Env env);
+   public abstract Type semantic(Env env);
 
 }

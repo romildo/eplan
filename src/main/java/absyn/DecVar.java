@@ -30,7 +30,7 @@ public class DecVar extends Dec {
    }
 
    @Override
-   public void semantic(Env env) {
+   public Type semantic(Env env) {
       Type t_init = init.semantic(env);
       Type t_var = t_init;
       if (typeName != null) {
@@ -42,5 +42,6 @@ public class DecVar extends Dec {
          t_var = t_typeName;
       }
       env.venv.put(name, t_var);
+      return t_init;
    }
 }
