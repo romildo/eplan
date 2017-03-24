@@ -84,6 +84,10 @@ in                   { return tok(IN); }
 if                   { return tok(IF); }
 then                 { return tok(THEN); }
 else                 { return tok(ELSE); }
+while                { return tok(WHILE); }
+do                   { return tok(DO); }
+break                { return tok(BREAK); }
+
 
 {id}                 { return tok(ID, yytext().intern()); }
 
@@ -100,5 +104,11 @@ else                 { return tok(ELSE); }
 ":"                  { return tok(COLON); }
 "="                  { return tok(EQ); }
 ":="                 { return tok(ASSIGN); }
+"=="                 { return tok(EQT); }
+"!="                 { return tok(NEQ); }
+"<"                  { return tok(LT); }
+"<="                 { return tok(LE); }
+">"                  { return tok(GT); }
+">="                 { return tok(GE); }
 
 .                    { throw error(Loc.loc(locLeft()), "unexpected char '%s'", yytext()); }
