@@ -53,18 +53,23 @@ terminal        IF, THEN, ELSE;
 terminal        TYPE;
 terminal        EQT, NEQ, LT, LE, GT, GE;
 terminal        WHILE, DO, BREAK;
+terminal        FUNCTION;
 
-non terminal Exp       program;
-non terminal Exp       exp;
-non terminal List<Exp> exps, expsRest;
-non terminal List<Exp> expseq, expseqRest;
-non terminal DecVar    decvar;
-non terminal DecType   dectype;
+non terminal Exp         program;
+non terminal Exp         exp;
+non terminal List<Exp>   exps, expsRest;
+non terminal List<Exp>   expseq, expseqRest;
+non terminal DecVar      decvar;
+non terminal DecType     dectype;
+non terminal DecFunction decfunc;
 non terminal List<DecType> dectypes;
-non terminal List<Dec> decs;
-non terminal List<Dec> decs_beg_with_variable, decs_beg_with_type;
-non terminal Var       var;
-non terminal Ty        ty;
+non terminal List<Dec>   decs;
+non terminal List<Dec>   decs_beg_with_variable, decs_beg_with_type, decs_beg_with_func;
+non terminal Var         var;
+non terminal Ty          ty;
+non terminal Parameter   parameter;
+non terminal List<Parameter> parameters, parametersRest;
+non terminal List<DecFunction>  decfuncs;
 
 
 precedence left OR;
@@ -146,17 +151,20 @@ dectypes ::=
 decs ::=
   decs_beg_with_variable:ds    {: RESULT = ds; :}
 | decs_beg_with_type:ds        {: RESULT = ds; :}
+| decs_beg_with_func:ds        {: RESULT = ds; :}
 ;
 
 decs_beg_with_variable ::=
   decvar:d                           {: RESULT = List.of(d); :}
 | decvar:d decs_beg_with_variable:ds {: RESULT = ds.prepend(d); :}
 | decvar:d decs_beg_with_type:ds     {: RESULT = ds.prepend(d); :}
+| decvar:d decs_beg_with_func:ds     {: RESULT = ds.prepend(d); :}
 ;
 
 decs_beg_with_type ::=
   dectypes:dt                           {: RESULT = List.of(new DecTypeMutual(loc(dtxleft,dtxright), dt)); :}
 | dectypes:dt decs_beg_with_variable:ds {: RESULT = ds.prepend(new DecTypeMutual(loc(dtxleft,dtxright), dt)); :}
+| dectypes:dt decs_beg_with_func:ds     {: RESULT = ds.prepend(new DecTypeMutual(loc(dtxleft,dtxright), dt)); :}
 ;
 
 var ::=
@@ -167,4 +175,32 @@ ty ::=
   ID:id                        {: RESULT = new TyName(loc(idxleft,idxright), id); :}
 ;
 
+parameter ::=
+  ID:n COLON ID:t              {: RESULT = new Parameter(loc(nxleft,txright),n,t); :}
+;
 
+parameters ::=
+  /* empty */                           {: RESULT = List.empty(); :}
+| parameter:p parametersRest:ps         {: RESULT = ps.prepend(p); :}
+;
+
+parametersRest ::=
+  /* empty */                           {: RESULT = List.empty(); :}
+| COMMA parameter:p parametersRest:ps   {: RESULT = ps.prepend(p); :}
+;
+
+decfunc ::=
+  FUNCTION:f ID:n LPAREN parameters:p RPAREN COLON ID:t EQ exp:b {: RESULT = new DecFunction(loc(fxleft,bxright),n,p,t,b); :}
+| FUNCTION:f ID:n LPAREN parameters:p RPAREN EQ exp:b {: RESULT = new DecFunction(loc(fxleft,bxright),n,p,null,b); :}
+;
+
+decfuncs ::=
+  decfunc:d                          {: RESULT = List.of(d); :}
+| decfunc:d decfuncs:ds              {: RESULT = ds.prepend(d); :}
+;
+
+decs_beg_with_func ::=
+  decfuncs:d                               {: RESULT = List.of(new DecFunctionMutual(loc(dxleft,dxright), d)); :}
+| decfuncs:d decs_beg_with_variable:ds     {: RESULT = ds.prepend(new DecFunctionMutual(loc(dxleft,dxright), d)); :}
+| decfuncs:d decs_beg_with_type:ds         {: RESULT = ds.prepend(new DecFunctionMutual(loc(dxleft,dxright), d)); :}
+;

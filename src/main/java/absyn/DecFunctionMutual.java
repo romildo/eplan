@@ -31,7 +31,7 @@ public class DecFunctionMutual extends Dec {
 
             Type t_result = UNIT.T;
             if (d.typeName != null) {
-                t_result = env.tenv.get(d.name);
+                t_result = env.tenv.get(d.typeName);
                 if (t_result == null) {
                     throw SemanticHelper.undefined(d.loc, "type", d.name);
                 }

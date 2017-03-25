@@ -87,7 +87,7 @@ else                 { return tok(ELSE); }
 while                { return tok(WHILE); }
 do                   { return tok(DO); }
 break                { return tok(BREAK); }
-
+function             { return tok(FUNCTION); }
 
 {id}                 { return tok(ID, yytext().intern()); }
 
