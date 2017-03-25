@@ -97,8 +97,12 @@ function             { return tok(FUNCTION); }
 "/"                  { return tok(DIV); }
 "&&"                 { return tok(AND); }
 "||"                 { return tok(OR); }
+
 "("                  { return tok(LPAREN); }
 ")"                  { return tok(RPAREN); }
+"["                  { return tok(LBRACK); }
+"]"                  { return tok(RBRACK); }
+
 ","                  { return tok(COMMA); }
 ";"                  { return tok(SEMICOLON); }
 ":"                  { return tok(COLON); }
@@ -110,5 +114,6 @@ function             { return tok(FUNCTION); }
 "<="                 { return tok(LE); }
 ">"                  { return tok(GT); }
 ">="                 { return tok(GE); }
+"@"                  { return tok(AT); }
 
 .                    { throw error(Loc.loc(locLeft()), "unexpected char '%s'", yytext()); }

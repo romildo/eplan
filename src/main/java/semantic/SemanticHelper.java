@@ -45,4 +45,7 @@ public interface SemanticHelper {
         return new CompilerError(loc, "function type mismatch: found %s in body but expected %s",found,result);
     }
 
+    static CompilerError arrayMismatch(Loc loc, Type found) {
+        return new CompilerError(loc, "type mismatch: found %s but expected array type",found);
+    }
 }
