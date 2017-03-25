@@ -32,10 +32,10 @@ public class ExpWhile extends Exp {
         final Type t_test = test.semantic(env);
         if (!t_test.is(BOOL.T))
             throw typeMismatch(test.loc, t_test, BOOL.T);
-
-        env.isWhile.add(new Boolean(true));
+        boolean localIsWhile = env.isWhile;
+        env.isWhile = true;
         body.semantic(env);
-        env.isWhile.remove(env.isWhile.size()-1);
+        env.isWhile = localIsWhile;
 
         return UNIT.T;
     }

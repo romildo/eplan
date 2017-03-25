@@ -2,18 +2,14 @@ package env;
 
 import types.*;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-
 public class Env {
 
     public Table<Type> tenv;
     public Table<Type> venv;
-    public List<Boolean> isWhile;
+    public boolean isWhile;
 
     public Env() {
-        isWhile = new ArrayList<>();
+        isWhile = false;
 
         tenv = new Table<Type>();
         put(tenv, "unit", UNIT.T);

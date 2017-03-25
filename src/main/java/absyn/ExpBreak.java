@@ -23,7 +23,7 @@ public class ExpBreak extends Exp {
 
     @Override
     protected Type semantic_(Env env) {
-        if (env.isWhile.size() == 0)
+        if (env.isWhile == false)
             throw breakOutWhile(loc);
         return UNIT.T;
     }
