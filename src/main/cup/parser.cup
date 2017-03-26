@@ -55,6 +55,7 @@ terminal        EQT, NEQ, LT, LE, GT, GE;
 terminal        WHILE, DO, BREAK;
 terminal        FUNCTION;
 terminal        LBRACK, RBRACK, AT;
+terminal        LBRACE, RBRACE;
 
 non terminal Exp         program;
 non terminal Exp         exp;
@@ -71,6 +72,8 @@ non terminal Ty          ty;
 non terminal Parameter   parameter;
 non terminal List<Parameter> parameters, parametersRest;
 non terminal List<DecFunction>  decfuncs;
+non terminal ParameterWithExp parameterexp;
+non terminal List<ParameterWithExp> parameterexps, parameterexpsRest;
 
 
 precedence left OR;
@@ -114,6 +117,7 @@ exp ::=
 | WHILE:w exp:t DO exp:b            {: RESULT = new ExpWhile(loc(wxleft,bxright), t, b); :}
 | BREAK:b                           {: RESULT = new ExpBreak(loc(bxleft,bxright)); :}
 | AT:a ID:id LBRACK exps:e RBRACK:r {: RESULT = new ExpArray(loc(axleft,rxright),id,e); :}
+| AT:a ID:id LBRACE parameterexps:f RBRACE:r{: RESULT = new ExpRecord(loc(axleft,rxright),id,f); :}
 ;
 
 exps ::=
@@ -174,8 +178,9 @@ var ::=
 ;
 
 ty ::=
-  ID:id                        {: RESULT = new TyName(loc(idxleft,idxright), id); :}
-| LBRACK:l ID:id RBRACK:r      {: RESULT = new TyArray(loc(idxleft,idxright), id); :}
+  ID:id                            {: RESULT = new TyName(loc(idxleft,idxright), id); :}
+| LBRACK:l ID:id RBRACK:r          {: RESULT = new TyArray(loc(idxleft,idxright), id); :}
+| LBRACE:l parameters:p RBRACE:r   {: RESULT = new TyRecord(loc(lxleft,rxright), p); :}
 ;
 
 parameter ::=
@@ -190,6 +195,20 @@ parameters ::=
 parametersRest ::=
   /* empty */                           {: RESULT = List.empty(); :}
 | COMMA parameter:p parametersRest:ps   {: RESULT = ps.prepend(p); :}
+;
+
+parameterexp ::=
+  ID:n EQ exp:e                {: RESULT = new ParameterWithExp(loc(nxleft,exright),n,e); :}
+;
+
+parameterexps ::=
+  /* empty */                                 {: RESULT = List.empty(); :}
+| parameterexp:p parameterexpsRest:ps         {: RESULT = ps.prepend(p); :}
+;
+
+parameterexpsRest ::=
+  /* empty */                                 {: RESULT = List.empty(); :}
+| COMMA parameterexp:p parameterexpsRest:ps   {: RESULT = ps.prepend(p); :}
 ;
 
 decfunc ::=

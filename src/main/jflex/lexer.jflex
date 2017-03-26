@@ -102,6 +102,8 @@ function             { return tok(FUNCTION); }
 ")"                  { return tok(RPAREN); }
 "["                  { return tok(LBRACK); }
 "]"                  { return tok(RBRACK); }
+"{"                  { return tok(LBRACE); }
+"}"                  { return tok(RBRACE); }
 
 ","                  { return tok(COMMA); }
 ";"                  { return tok(SEMICOLON); }

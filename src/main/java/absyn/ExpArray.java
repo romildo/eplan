@@ -21,7 +21,7 @@ public class ExpArray  extends Exp{
 
     @Override
     public Tree.Node<String> toTree() {
-        return Tree.of("ArrayExp",Tree.of(typeName),Tree.of("Elements", elements.map(Exp::toTree)));
+        return Tree.of("ExpArray",Tree.of(typeName),Tree.of("Elements", elements.map(Exp::toTree)));
     }
 
     @Override
