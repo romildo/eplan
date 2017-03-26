@@ -76,6 +76,7 @@ non terminal List<DecFunction>  decfuncs;
 non terminal ParameterWithExp parameterexp;
 non terminal List<ParameterWithExp> parameterexps, parameterexpsRest;
 non terminal Dec         decsvar;
+non terminal DecVarArray  devvararray;
 non terminal DecVarRecord decvarrecord;
 
 precedence left OR;
@@ -152,8 +153,14 @@ decvarrecord ::=
 | VAR:v ID:x EQ ID:bv DOT ID:br            {: RESULT = new DecVarRecord(loc(vxleft,brxright),x,null,bv,br); :}
 ;
 
+devvararray ::=
+  VAR:v ID:x COLON ID:t EQ ID:bv LBRACK exp:e RBRACK:r {: RESULT = new DecVarArray(loc(vxleft,rxright),x,t,bv,e); :}
+| VAR:v ID:x EQ ID:bv LBRACK exp:e RBRACK:r {: RESULT = new DecVarArray(loc(vxleft,rxright),x,null,bv,e); :}
+;
+
 decsvar ::=
   decvar:d                           {: RESULT = d; :}
+| devvararray:d                      {: RESULT = d; :}
 | decvarrecord:d                     {: RESULT = d; :}
 ;
 

@@ -35,8 +35,9 @@ public class DecVarRecord extends Dec {
 
     @Override
     public Type semantic(Env env) {
+        Type t_typeName;
         if (typeName != null) {
-            Type t_typeName = env.tenv.get(typeName);
+            t_typeName = env.tenv.get(typeName);
 
             if (t_typeName == null)
                 throw SemanticHelper.undefined(loc, "type", typeName);
@@ -54,8 +55,7 @@ public class DecVarRecord extends Dec {
                         throw SemanticHelper.typeMismatch(loc, t_typeName, t_aux);
                 }
             }
-            env.venv.put(name, t_typeName);
-            return t_typeName;
+
         }
         else{
             Type t_bodyVar = env.venv.get(bodyVarName);
@@ -66,10 +66,9 @@ public class DecVarRecord extends Dec {
             if (t_p.isEmpty())
                 throw SemanticHelper.unknownRecordParameter(loc, bodyRegisterName);
 
-            Type t_aux = t_p.get().semantic_(env);
-            env.venv.put(name, t_aux);
-            return t_aux;
+            t_typeName = t_p.get().semantic_(env);
         }
-
+        env.venv.put(name, t_typeName);
+        return t_typeName;
     }
 }
