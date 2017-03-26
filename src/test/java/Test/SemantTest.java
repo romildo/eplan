@@ -113,4 +113,71 @@ public class SemantTest {
            "error.CompilerError: 1/14-1/17 type mismatch: found real but expected unit");
    }
 
+   @Test
+   public void testBooleanArguments() throws Exception {
+      trun("2 == 2", BOOL.T);
+      trun("2 > 2", BOOL.T);
+      trun("2 < 2", BOOL.T);
+      trun("2 >= 2", BOOL.T);
+      trun("2 <= 2", BOOL.T);
+      trun("2 != 2", BOOL.T);
+      erun("2 => 2", "error.CompilerError: 1/3-1/4 Syntax error at '='");
+      erun("2 =< 2", "error.CompilerError: 1/3-1/4 Syntax error at '='");
+      erun("2 =! 2", "error.CompilerError: 1/3-1/4 Syntax error at '='");
+      erun("2 == test", "error.CompilerError: 1/6-1/10 undefined variable 'test'");
+   }
+
+   @Test
+   public void testWhile() throws Exception {
+      trun("while true do 1", UNIT.T);
+      trun("while false do 1", UNIT.T);
+      trun("while 2 == 2 do 1", UNIT.T);
+      trun("while 2 > 2 do print_int(2)", UNIT.T);
+      trun("while 2 > 2 do let var x = 2 in x", UNIT.T);
+      trun("let var x = 2 var y = 2 in while x > y do print_int(x)", UNIT.T);
+      erun("while 2 do 1", "error.CompilerError: 1/7-1/8 type mismatch: found int but expected bool");
+      erun("while print_int(2) do print_int(2)", "error.CompilerError: 1/7-1/19 type mismatch: found unit but expected bool");
+   }
+
+   @Test
+   public void testBreak() throws Exception {
+      trun("while true do break", UNIT.T);
+      trun("while true do let var x = 2 in break", UNIT.T);
+      erun("let var x = 2 in break", "error.CompilerError: 1/18-1/23 break ins't in loop.");
+      erun("break", "error.CompilerError: 1/1-1/6 break ins't in loop.");
+      erun("while true do let var x = 2 break in break", "error.CompilerError: 1/29-1/34 Syntax error at 'break'");
+   }
+
+   @Test
+   public void testFunction() throws Exception {
+      trun("let function teste(x:int):int = x in teste(2)", INT.T);
+      trun("let function teste(x:real):real = x in teste(2.2)", REAL.T);
+      trun("let function teste(x:bool):bool = x in teste(true)", BOOL.T);
+      trun("let function teste(x:unit):unit = x in teste(())", UNIT.T);
+      trun("let function teste(x:unit, y:unit):unit = x in teste((),())", UNIT.T);
+      trun("let function teste(x:int, y:int):int = x in teste(2 , 2)", INT.T);
+      trun("let function teste(x:real, y:real):real = x in teste(2.2 , 2.2)", REAL.T);
+      erun("let function teste(x:int):int = x in teste(2.2)", "error.CompilerError: 1/44-1/47 type mismatch: found real but expected int");
+      erun("let function teste(x:int):real = x in teste(2)", "error.CompilerError: 1/5-1/35 function type mismatch: found int in body but expected real");
+      erun("let function teste(x:real):int = x in teste(2)", "error.CompilerError: 1/5-1/35 function type mismatch: found real in body but expected int");
+      erun("let function teste(x:int):int = x in teste(())", "error.CompilerError: 1/44-1/46 type mismatch: found unit but expected int");
+      erun("let function teste(x:unit):unit = x in teste()", "error.CompilerError: 1/40-1/47 too few arguments in call to 'teste'");
+      erun("let function teste(x:unit):unit = x in teste(2)", "error.CompilerError: 1/46-1/47 type mismatch: found int but expected unit");
+      erun("let function teste(x:unit):int = x in teste(2)", "error.CompilerError: 1/5-1/35 function type mismatch: found unit in body but expected int");
+      erun("let function teste(x:unit):int = x in teste(2.2)", "error.CompilerError: 1/5-1/35 function type mismatch: found unit in body but expected int");
+      erun("let function teste(x:real):real = x in teste(2)", "error.CompilerError: 1/46-1/47 type mismatch: found int but expected real");
+      erun("let function teste(x:real):real = x in teste(())", "error.CompilerError: 1/46-1/48 type mismatch: found unit but expected real");
+      erun("let function teste(x:real):unit = x in teste(())", "error.CompilerError: 1/5-1/36 function type mismatch: found real in body but expected unit");
+      erun("let function teste(x:unit):real = x in teste(())", "error.CompilerError: 1/5-1/36 function type mismatch: found unit in body but expected real");
+      erun("let function teste(x:unit):real = x in teste(2.2)", "error.CompilerError: 1/5-1/36 function type mismatch: found unit in body but expected real");
+      erun("let function teste(x:real, y:real):int = x in teste(2.2, 2.2)", "error.CompilerError: 1/5-1/43 function type mismatch: found real in body but expected int");
+      erun("let function teste(x:real, y:real):real = x in teste(2.2, 2)", "error.CompilerError: 1/59-1/60 type mismatch: found int but expected real");
+      erun("let function teste(x:real, y:real):real = x in teste(2, 2)", "error.CompilerError: 1/54-1/55 type mismatch: found int but expected real");
+      erun("let function teste(x:unit, y:real):real = x in teste((), 2)", "error.CompilerError: 1/5-1/44 function type mismatch: found unit in body but expected real");
+   }
+
+   @Test
+   public void testArray() throws Exception {
+
+   }
 }
