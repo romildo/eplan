@@ -52,7 +52,7 @@ public class ExpRecord extends Exp{
                  else{
                      Type t_aux = t_p.get().semantic_(env);
                      if (!t_parameterWithExp.is(t_aux))
-                         throw SemanticHelper.recordTypeMismatch(loc, parameterWithExp.name, t_aux, t_parameterWithExp);
+                         throw SemanticHelper.recordTypeMismatch(loc, parameterWithExp.name, t_parameterWithExp, t_aux);
                      t_parameters = t_parameters.remove(t_p.get());
                  }
                  verify = verify.prepend(parameterWithExp.name);
