@@ -65,7 +65,10 @@ public class DecVarRecord extends Dec {
             Option<Parameter> t_p = t_bodyParams.find(p -> p.name == bodyRegisterName);
             if (t_p.isEmpty())
                 throw SemanticHelper.unknownRecordParameter(loc, bodyRegisterName);
-            return t_p.get().semantic_(env);
+
+            Type t_aux = t_p.get().semantic_(env);
+            env.venv.put(name, t_aux);
+            return t_aux;
         }
 
     }
