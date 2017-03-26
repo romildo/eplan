@@ -108,6 +108,7 @@ function             { return tok(FUNCTION); }
 ","                  { return tok(COMMA); }
 ";"                  { return tok(SEMICOLON); }
 ":"                  { return tok(COLON); }
+"."                  { return tok(DOT); }
 "="                  { return tok(EQ); }
 ":="                 { return tok(ASSIGN); }
 "=="                 { return tok(EQT); }
