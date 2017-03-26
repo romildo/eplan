@@ -76,7 +76,16 @@ public interface SemanticHelper {
         return new CompilerError(loc, "type mismatch in record parameter %s: found %s but expected %S", name, found, builder);
     }
 
-    static CompilerError missingParametersRecord(Loc loc, List<String> s) {
-        return new CompilerError(loc, "missing parameters %s in record", s.toString());
+    static CompilerError missingParametersRecord(Loc loc, List<String> list) {
+        final StringBuilder builder = new StringBuilder();
+        final int n = list.size();
+        if (n > 0) {
+            builder.append(list.get());
+            if (n > 1) {
+                for (int i = 1; i < n; i++)
+                    builder.append(", ").append(list.get(i));
+            }
+        }
+        return new CompilerError(loc, "missing parameters %s in record", builder);
     }
 }
