@@ -45,7 +45,7 @@ terminal String ID;
 terminal        PLUS, MINUS, TIMES, DIV, UMINUS;
 terminal        AND, OR;
 terminal        LESS, LESSEG, MORE, MOREEG, EQUALS, DIF;
-terminal        LPAREN, RPAREN;
+terminal        LPAREN, RPAREN, LBRACKET, RBRACKET, AT;
 terminal        COMMA, SEMICOLON;
 terminal        VAR, EQ, COLON;
 terminal        LET, IN;
@@ -72,10 +72,9 @@ non terminal Param     param;
 non terminal DecFunction decfunction;
 non terminal List<DecFunction> decfunctions;
 
-precedence left EQUALS, DIF;
 precedence left OR;
 precedence left AND;
-precedence left LESS, LESSEG, MORE, MOREEG;
+precedence left EQUALS, DIF, LESS, LESSEG, MORE, MOREEG;
 precedence left PLUS, MINUS;
 precedence left TIMES, DIV;
 precedence left UMINUS;
@@ -88,31 +87,32 @@ program ::=
 ;
 
 exp ::=
-  exp:x PLUS exp:y                 {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.PLUS, x, y); :}
-| exp:x MINUS exp:y                {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.MINUS, x, y); :}
-| exp:x TIMES exp:y                {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.TIMES, x, y); :}
-| exp:x DIV exp:y                  {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.DIV, x, y); :}
-| exp:x AND exp:y                  {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.AND, x, y); :}
-| exp:x OR exp:y                   {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.OR, x, y); :}
-| exp:x LESS exp:y                 {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.LESS, x, y); :}
-| exp:x LESSEG exp:y               {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.LESSEG, x, y); :}
-| exp:x MORE exp:y                 {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.MORE, x, y); :}
-| exp:x MOREEG exp:y               {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.MOREEG, x, y); :}
-| exp:x EQUALS exp:y               {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.EQUALS, x, y); :}
-| exp:x DIF exp:y                  {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.DIF, x, y); :}
-| LITINT:x                         {: RESULT = new ExpInt(loc(xxleft,xxright), x); :}
-| LITREAL:x                        {: RESULT = new ExpReal(loc(xxleft,xxright), x); :}
-| LITBOOL:x                        {: RESULT = new ExpBool(loc(xxleft,xxright), x); :}
-| MINUS:m exp:x                    {: RESULT = new ExpNegate(loc(mxleft,xxright), x); :}  %prec UMINUS
-| ID:f LPAREN exps:x RPAREN:r      {: RESULT = new ExpCall(loc(fxleft,rxright), f, x); :}
-| var:v                            {: RESULT = new ExpVar(loc(vxleft,vxright), v); :}
-| var:v ASSIGN exp:e               {: RESULT = new ExpAssign(loc(vxleft,exright), v, e); :}
-| LET:l decs:ds IN exp:b           {: RESULT = new ExpLet(loc(lxleft,bxright), ds, b); :}
-| LPAREN:l expseq:es RPAREN:r      {: RESULT = new ExpSeq(loc(lxleft,rxright), es); :}
-| IF:i exp:t THEN exp:a ELSE exp:b {: RESULT = new ExpIf(loc(ixleft,bxright), t, a, b); :}
-| IF:i exp:t THEN exp:a            {: RESULT = new ExpIf(loc(ixleft,axright), t, a, null); :}
-| BREAK:x                          {: RESULT = new ExpBreak(loc(xxleft,xxright)); :}
-| WHILE:i exp:t DO exp:a           {: RESULT = new ExpWhile(loc(ixleft,axright), t, a); :}
+  exp:x PLUS exp:y                         {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.PLUS, x, y); :}
+| exp:x MINUS exp:y                        {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.MINUS, x, y); :}
+| exp:x TIMES exp:y                        {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.TIMES, x, y); :}
+| exp:x DIV exp:y                          {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.DIV, x, y); :}
+| exp:x AND exp:y                          {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.AND, x, y); :}
+| exp:x OR exp:y                           {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.OR, x, y); :}
+| exp:x LESS exp:y                         {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.LESS, x, y); :}
+| exp:x LESSEG exp:y                       {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.LESSEG, x, y); :}
+| exp:x MORE exp:y                         {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.MORE, x, y); :}
+| exp:x MOREEG exp:y                       {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.MOREEG, x, y); :}
+| exp:x EQUALS exp:y                       {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.EQUALS, x, y); :}
+| exp:x DIF exp:y                          {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.DIF, x, y); :}
+| LITINT:x                                 {: RESULT = new ExpInt(loc(xxleft,xxright), x); :}
+| LITREAL:x                                {: RESULT = new ExpReal(loc(xxleft,xxright), x); :}
+| LITBOOL:x                                {: RESULT = new ExpBool(loc(xxleft,xxright), x); :}
+| MINUS:m exp:x                            {: RESULT = new ExpNegate(loc(mxleft,xxright), x); :}  %prec UMINUS
+| ID:f LPAREN exps:x RPAREN:r              {: RESULT = new ExpCall(loc(fxleft,rxright), f, x); :}
+| var:v                                    {: RESULT = new ExpVar(loc(vxleft,vxright), v); :}
+| var:v ASSIGN exp:e                       {: RESULT = new ExpAssign(loc(vxleft,exright), v, e); :}
+| LET:l decs:ds IN exp:b                   {: RESULT = new ExpLet(loc(lxleft,bxright), ds, b); :}
+| LPAREN:l expseq:es RPAREN:r              {: RESULT = new ExpSeq(loc(lxleft,rxright), es); :}
+| IF:i exp:t THEN exp:a ELSE exp:b         {: RESULT = new ExpIf(loc(ixleft,bxright), t, a, b); :}
+| IF:i exp:t THEN exp:a                    {: RESULT = new ExpIf(loc(ixleft,axright), t, a, null); :}
+| BREAK:x                                  {: RESULT = new ExpBreak(loc(xxleft,xxright)); :}
+| WHILE:i exp:t DO exp:a                   {: RESULT = new ExpWhile(loc(ixleft,axright), t, a); :}
+| AT:i ID:id LBRACKET exps:x RBRACKET:r    {: RESULT = new ExpArray(loc(ixleft,rxright),id, x); :}
 ;
 
 exps ::=
@@ -184,11 +184,13 @@ decs_beg_with_type ::=
 ;
 
 var ::=
-  ID:v                         {: RESULT = new VarSimple(loc(vxleft,vxright), v); :}
+  ID:v                              {: RESULT = new VarSimple(loc(vxleft,vxright), v); :}
+| var:v LBRACKET exp:e RBRACKET:r   {: RESULT = new VarSubscript(loc(vxleft,rxright), v, e); :}
 ;
 
 ty ::=
   ID:id                       {: RESULT = new TyName(loc(idxleft,idxright), id); :}
+| LBRACKET:l ID:id RBRACKET:r {: RESULT = new TyArray(loc(lxleft,rxright), id); :}
 ;
 
 param ::=

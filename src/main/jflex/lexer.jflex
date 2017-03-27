@@ -110,5 +110,8 @@ function             { return tok(FUNCTION); }
 ":"                  { return tok(COLON); }
 "="                  { return tok(EQ); }
 ":="                 { return tok(ASSIGN); }
+"["                  { return tok(LBRACKET); }
+"]"                  { return tok(RBRACKET); }
+"@"                  { return tok(AT); }
 
 .                    { throw error(Loc.loc(locLeft()), "unexpected char '%s'", yytext()); }

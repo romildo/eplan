@@ -24,7 +24,7 @@ public class ExpWhile extends Exp {
 
     @Override
     public Tree.Node<String> toTree() {
-        return Tree.of(annotateType("ExpWhile"),test.toTree(),body.toTree());
+        return Tree.of(annotateType("ExpWhile"), test.toTree(), body.toTree());
     }
 
     @Override
@@ -32,9 +32,10 @@ public class ExpWhile extends Exp {
         Type t_test = test.semantic_(env);
         if (!t_test.is(BOOL.T))
             throw new CompilerError(loc, "type mismatch: found %s but expected %s", t_test, BOOL.T);
+        boolean aux = env.isWhile;
         env.isWhile = true;
-        Type t_body = body.semantic_(env);
-        env.isWhile = false;
+        body.semantic_(env);
+        env.isWhile = aux;
         return UNIT.T;
     }
 }
