@@ -27,6 +27,7 @@ public class ExpArray  extends Exp{
     @Override
     protected Type semantic_(Env env) {
         Type t_typeName = env.tenv.get(typeName);
+        Type t_test = t_typeName;
         if (t_typeName == null)
             throw SemanticHelper.undefined(loc,"type",typeName);
         else{
@@ -43,6 +44,6 @@ public class ExpArray  extends Exp{
                 throw SemanticHelper.typeMismatch(loc,t_aux,t_elements);
         }
 
-        return t_typeName;
+        return t_test;
     }
 }
