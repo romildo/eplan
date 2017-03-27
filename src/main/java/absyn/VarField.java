@@ -42,7 +42,7 @@ public class VarField extends Var {
             throw SemanticHelper.unknownRecordParameter(loc, field);
 
         Type t_aux = t_p.get().semantic_(env);
-        t_aux = t_aux.actual();
+        //t_aux = t_aux.actual();
         return t_aux;
     }
 

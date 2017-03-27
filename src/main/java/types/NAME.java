@@ -24,4 +24,9 @@ public class NAME extends Type {
     public Type actual() {
         return binding.actual();
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }
