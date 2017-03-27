@@ -40,7 +40,6 @@ public class VarSubscript extends Var {
 
       t_base = ((ARRAY)t_base).typeName;
 
-      System.out.println("VarSubscript: "+t_base);
       return t_base;
    }
 

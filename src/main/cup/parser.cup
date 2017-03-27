@@ -75,8 +75,6 @@ non terminal List<Parameter> parameters, parametersRest;
 non terminal List<DecFunction>  decfuncs;
 non terminal ParameterWithExp parameterexp;
 non terminal List<ParameterWithExp> parameterexps, parameterexpsRest;
-non terminal Dec         decsvar;
-non terminal DecVarRecord decvarrecord;
 
 precedence left OR;
 precedence left AND;
@@ -147,17 +145,6 @@ decvar ::=
 | VAR:v ID:x EQ exp:e            {: RESULT = new DecVar(loc(vxleft,exright), x, null, e); :}
 ;
 
-decvarrecord ::=
-  VAR:v ID:x COLON ID:t EQ ID:bv DOT ID:br {: RESULT = new DecVarRecord(loc(vxleft,brxright),x,t,bv,br); :}
-| VAR:v ID:x EQ ID:bv DOT ID:br            {: RESULT = new DecVarRecord(loc(vxleft,brxright),x,null,bv,br); :}
-;
-
-
-decsvar ::=
-  decvar:d                           {: RESULT = d; :}
-| decvarrecord:d                     {: RESULT = d; :}
-;
-
 dectype ::=
   TYPE:t ID:id EQ ty:ty          {: RESULT = new DecType(loc(txleft,tyxright), id,ty); :}
 ;
@@ -174,10 +161,10 @@ decs ::=
 ;
 
 decs_beg_with_variable ::=
-  decsvar:d                           {: RESULT = List.of(d); :}
-| decsvar:d decs_beg_with_variable:ds {: RESULT = ds.prepend(d); :}
-| decsvar:d decs_beg_with_type:ds     {: RESULT = ds.prepend(d); :}
-| decsvar:d decs_beg_with_func:ds     {: RESULT = ds.prepend(d); :}
+  decvar:d                           {: RESULT = List.of(d); :}
+| decvar:d decs_beg_with_variable:ds {: RESULT = ds.prepend(d); :}
+| decvar:d decs_beg_with_type:ds     {: RESULT = ds.prepend(d); :}
+| decvar:d decs_beg_with_func:ds     {: RESULT = ds.prepend(d); :}
 ;
 
 decs_beg_with_type ::=
@@ -187,8 +174,9 @@ decs_beg_with_type ::=
 ;
 
 var ::=
-  ID:v                         {: RESULT = new VarSimple(loc(vxleft,vxright), v); :}
+  ID:v                          {: RESULT = new VarSimple(loc(vxleft,vxright), v); :}
 | var:x LBRACK exp:e RBRACK:r   {: RESULT = new VarSubscript(loc(xxleft,rxright), x, e); :}
+| var:x DOT ID:id               {: RESULT = new VarField(loc(xxleft,idxright), x, id); :}
 ;
 
 ty ::=

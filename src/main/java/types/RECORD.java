@@ -14,7 +14,16 @@ public class RECORD extends Type {
 
     @Override
     public String toString() {
-        return "RECORD  [" + elements + "]";
+        final StringBuilder builder = new StringBuilder();
+        final int n = elements.size();
+        if (n > 0) {
+            builder.append(elements.get());
+            if (n > 1) {
+                for (int i = 1; i < n; i++)
+                    builder.append(", ").append(elements.get(i));
+            }
+        }
+        return "RECORD  {" + builder + "}";
     }
 
     @Override

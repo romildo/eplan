@@ -29,4 +29,9 @@ public class Parameter extends Exp {
             throw SemanticHelper.undefined(loc, "type", typeName);
         return t_type;
     }
+
+    @Override
+    public String toString() {
+        return  name + " : " + typeName;
+    }
 }
