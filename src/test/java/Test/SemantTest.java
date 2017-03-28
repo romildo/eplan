@@ -178,14 +178,21 @@ public class SemantTest {
 
    @Test
    public void testArray() throws Exception {
+      trun("let type t1 = [int] var a1:t1 = @t1[10,20,30] in print_int(a1[2])", UNIT.T);
       trun("let type t = [int] var v:t = @t[10,20,30] var x:int = v[1] var y:int = v[x] in x", INT.T);
       trun("let type t = [int] var v:t = @t[10,20,30] var x :int= v[2+3] in 2", INT.T);
       trun("let type t = [int] var v:t = @t[10,20,30] var x :int= v[2+3] in x", INT.T);
       trun("let type t = [int] var v:t = @t[10,20] var x:int = v[2] in x", INT.T);
       trun("let type t = [real] var v:t = @t[10.0,20.0] var x:real = v[2] in x", REAL.T);
       trun("let type t = [unit] var v:t = @t[()] var x:unit = v[2] in x", UNIT.T);
+      trun("let type t1 = [int] type t2 = [t1] var a1 = @t2   [@t1[10,20], @t1[30]] in (a1[1][0]:=18; print_int(a1[1][0]))", UNIT.T);
+      erun("let var a1 = 2.3 var x = a[1] in print_int(x)", "error.CompilerError: 1/26-1/27 undefined variable 'a'");
+      erun("let type t1 = [int] var a1 = @int[10,20,30] in print_int(a1)", "error.CompilerError: 1/30-1/44 type mismatch: found int but expected array type");
+      erun("let type t1 = [abobrinha] var a1:t1 = @t1[10,20,30] in print_int(a1)", "error.CompilerError: 1/16-1/25 undefined type 'abobrinha'");
+      erun("let type t = [int] var v:t = @t[10,20,30] var x = b[1] in x", "error.CompilerError: 1/51-1/52 undefined variable 'b'");
+      erun("let type t1 = [int] var a1 = @t2[10,20,30] in print_int(a1[2])", "error.CompilerError: 1/30-1/43 undefined type 't2'");
       erun("let type t = [unit] var v:t = @t[(),1] var x:unit = v[2] in x", "error.CompilerError: 1/31-1/39 type mismatch: found int but expected unit");
-      erun("let type t = [real] var v:t = @t[10.0,20.0] var x:int = v[2] in x", "error.CompilerError: 1/45-1/61 type mismatch: found int but expected real");
+      erun("let type t = [real] var v:t = @t[10.0,20.0] var x:int = v[2] in x", "error.CompilerError: 1/57-1/61 type mismatch: found real but expected int");
       erun("let type t = [real] var v:t = @t[10.0,20.0] var x:real = v[2.0] in x", "error.CompilerError: 1/60-1/63 type mismatch: found real but expected int");
       erun("let type t = [int] var v:t = @t[10,20,()] var x :int= v[2+3] in 2", "error.CompilerError: 1/30-1/42 type mismatch: found unit but expected int");
       erun("let type t = [int] var v:t = @t[10,20,30] var x:int = v[y] var y:int = v[1] in x", "error.CompilerError: 1/57-1/58 undefined variable 'y'");
@@ -193,6 +200,7 @@ public class SemantTest {
 
    @Test
    public void testRegisters() throws Exception {
+      trun("let type t1 = [int] type t2 = {x:int, y:t1} var k = @t2{x=10, y=@t1[10,20,30]} in k.y[1]", INT.T);
       trun("let type ponto = {x:real, y:int} var p:ponto = @ponto{x=2.3,y=8} var x : int = p.y in x", INT.T);
       trun("let type ponto = {x:real, y:real} var p:ponto = @ponto{x=2.3,y=0.8} var x : real = p.x in 2", INT.T);
       trun("let type ponto = {x:real, y:real} var p:ponto = @ponto{x=2.3,y=0.8} var x : real = p.x in x", REAL.T);
@@ -200,8 +208,8 @@ public class SemantTest {
       trun("let type ponto = {x:unit, y:unit} var p:ponto = @ponto{x=(),y=()} var x : unit = p.x in 2", INT.T);
       trun("let type ponto = {x:unit, y:unit} var p:ponto = @ponto{x=(),y=()} var x : unit = p.x in ()", UNIT.T);
       trun("let type ponto = {x:unit, y:unit} var p:ponto = @ponto{x=(),y=()} var x : unit = p.x in x", UNIT.T);
-      erun("let type ponto = {x:int, y:int} var p:ponto = @ponto{x=2,y=0} var x : real = p.x in 2", "error.CompilerError: 1/63-1/81 type mismatch: found real but expected int");
-      erun("let type ponto = {x:real, y:real} var p:ponto = @ponto{x=2.3,y=0.8} var x : int = p.x in ()", "error.CompilerError: 1/69-1/86 type mismatch: found int but expected real");
-      erun("let type ponto = {x:real, y:int} var p:ponto = @ponto{x=2.3,y=8} var x : real = p.y in x", "error.CompilerError: 1/66-1/84 type mismatch: found real but expected int");
+      erun("let type ponto = {x:int, y:int} var p:ponto = @ponto{x=2,y=0} var x : real = p.x in 2", "error.CompilerError: 1/78-1/81 type mismatch: found int but expected real");
+      erun("let type ponto = {x:real, y:real} var p:ponto = @ponto{x=2.3,y=0.8} var x : int = p.x in ()", "error.CompilerError: 1/83-1/86 type mismatch: found real but expected int");
+      erun("let type ponto = {x:real, y:int} var p:ponto = @ponto{x=2.3,y=8} var x : real = p.y in x", "error.CompilerError: 1/81-1/84 type mismatch: found int but expected real");
    }
 }
