@@ -1,0 +1,12 @@
+Segue o trabalho implementado pelo grupo formado por:
+  - Christian Felipe
+  - Daiane Oliveira
+  - Luiz Janeiro
+
+Professor, foi implementado os seguintes componentes:
+  - O que já tinha sido feito na aula
+  - While e Break
+  - Operadores relacionais
+  - Funções
+  - Array
+  - Registros (Só a declaração de tipo, declaração de variável não deu pra terminar)

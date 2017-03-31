@@ -16,7 +16,9 @@ public class ExpBinOp extends Exp {
 
    public enum Op {
       PLUS, MINUS, TIMES, DIV,
-      AND, OR
+      AND, OR, LESS, LESS_EQ,
+      GREATER, GREATER_EQ,
+      EQUAL, NOT_EQUAL
    }
 
    public final Op op;
@@ -65,7 +67,18 @@ public class ExpBinOp extends Exp {
                throw typeMismatch(right.loc, t_right, BOOL.T);
 
             return BOOL.T;
+         case LESS:
+         case LESS_EQ:
+         case GREATER:
+         case GREATER_EQ:
+         case EQUAL:
+         case NOT_EQUAL:
+            if(!t_left.is(INT.T, REAL.T))
+               throw typeMismatch(left.loc, t_left, INT.T, REAL.T);
+            if (!t_right.is(INT.T, REAL.T))
+               throw typeMismatch(right.loc, t_right, INT.T, REAL.T);
 
+            return BOOL.T;
          default:
             throw fatal("unexpected invalid operator: %s", op);
       }

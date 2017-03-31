@@ -6,6 +6,7 @@ public class Env {
 
   public Table<Type> tenv;
   public Table<Type> venv;
+  public boolean controlBreak;
 
   public Env() {
     tenv = new Table<Type>();

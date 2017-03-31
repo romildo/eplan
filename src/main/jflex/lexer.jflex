@@ -85,6 +85,12 @@ if                   { return tok(IF); }
 then                 { return tok(THEN); }
 else                 { return tok(ELSE); }
 
+while                { return tok(WHILE); }
+do                   { return tok(DO); }
+break                { return tok(BREAK); }
+
+function             { return tok(FUNCTION); }
+
 {id}                 { return tok(ID, yytext().intern()); }
 
 "+"                  { return tok(PLUS); }
@@ -100,5 +106,17 @@ else                 { return tok(ELSE); }
 ":"                  { return tok(COLON); }
 "="                  { return tok(EQ); }
 ":="                 { return tok(ASSIGN); }
+"<"                  { return tok(LESS); }
+"<="                 { return tok(LESS_EQ); }
+">"                  { return tok(GREATER); }
+">="                 { return tok(GREATER_EQ); }
+"=="                 { return tok(EQUAL); }
+"!="                 { return tok(NOT_EQUAL); }
+
+"["                  { return tok(LBRACKET); }
+"]"                  { return tok(RBRACKET); }
+"{"                  { return tok(LKEY); }
+"}"                  { return tok(RKEY); }
+"@"                  { return tok(CONSTRUCTOR); }
 
 .                    { throw error(Loc.loc(locLeft()), "unexpected char '%s'", yytext()); }

@@ -45,22 +45,36 @@ terminal String ID;
 terminal        PLUS, MINUS, TIMES, DIV, UMINUS;
 terminal        AND, OR;
 terminal        LPAREN, RPAREN;
+terminal        LBRACKET, RBRACKET, LKEY, RKEY;
 terminal        COMMA, SEMICOLON;
 terminal        VAR, EQ, COLON;
 terminal        LET, IN;
 terminal        ASSIGN;
 terminal        IF, THEN, ELSE;
+terminal        WHILE, DO, BREAK;
 terminal        TYPE;
+terminal        LESS, LESS_EQ;
+terminal        GREATER, GREATER_EQ;
+terminal        EQUAL, NOT_EQUAL;
+terminal        CONSTRUCTOR;
+terminal        FUNCTION;
+
 
 non terminal Exp       program;
 non terminal Exp       exp;
 non terminal List<Exp> exps, expsRest;
 non terminal List<Exp> expseq, expseqRest;
+
+non terminal Parameter parameter;
+non terminal List<Parameter> parameters, parametersRest;
+
 non terminal DecVar    decvar;
 non terminal DecType   dectype;
+non terminal DecFunction   decfunction;
 non terminal List<DecType> dectypes;
+non terminal List<DecFunction> decfunctions;
 non terminal List<Dec> decs;
-non terminal List<Dec> decs_beg_with_variable, decs_beg_with_type;
+non terminal List<Dec> decs_beg_with_variable, decs_beg_with_type, decs_beg_with_function;
 non terminal Var       var;
 non terminal Ty        ty;
 
@@ -70,6 +84,12 @@ precedence left PLUS, MINUS;
 precedence left TIMES, DIV;
 precedence left UMINUS;
 precedence nonassoc ELSE;
+precedence nonassoc LESS;
+precedence nonassoc GREATER;
+precedence nonassoc LESS_EQ;
+precedence nonassoc GREATER_EQ;
+precedence nonassoc NOT_EQUAL;
+precedence nonassoc EQUAL;
 
 start with program;
 
@@ -84,6 +104,12 @@ exp ::=
 | exp:x DIV exp:y                  {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.DIV, x, y); :}
 | exp:x AND exp:y                  {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.AND, x, y); :}
 | exp:x OR exp:y                   {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.OR, x, y); :}
+| exp:x LESS exp:y                      {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.LESS, x, y); :}
+| exp:x LESS_EQ exp:y                   {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.LESS_EQ, x, y); :}
+| exp:x GREATER exp:y                   {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.GREATER, x, y); :}
+| exp:x GREATER_EQ exp:y                {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.GREATER_EQ, x, y); :}
+| exp:x EQUAL exp:y                     {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.EQUAL, x, y); :}
+| exp:x NOT_EQUAL exp:y                 {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.NOT_EQUAL, x, y); :}
 | LITINT:x                         {: RESULT = new ExpInt(loc(xxleft,xxright), x); :}
 | LITREAL:x                        {: RESULT = new ExpReal(loc(xxleft,xxright), x); :}
 | LITBOOL:x                        {: RESULT = new ExpBool(loc(xxleft,xxright), x); :}
@@ -95,6 +121,9 @@ exp ::=
 | LPAREN:l expseq:es RPAREN:r      {: RESULT = new ExpSeq(loc(lxleft,rxright), es); :}
 | IF:i exp:t THEN exp:a ELSE exp:b {: RESULT = new ExpIf(loc(ixleft,bxright), t, a, b); :}
 | IF:i exp:t THEN exp:a            {: RESULT = new ExpIf(loc(ixleft,axright), t, a, null); :}
+| WHILE:w exp:c DO exp:e           {: RESULT = new ExpWhile(loc(wxleft, exright), c, e); :}
+| BREAK:b                          {: RESULT = new ExpBreak(loc(bxleft, bxright)); :}
+| CONSTRUCTOR:c ID:type LBRACKET exps:e RBRACKET:r      {: RESULT = new ExpArray(loc(cxleft, rxright), type, e); :}
 ;
 
 exps ::=
@@ -117,6 +146,20 @@ expseqRest ::=
 | SEMICOLON exp:x expseqRest:xs {: RESULT = xs.prepend(x); :}
 ;
 
+parameter ::=
+  ID:field COLON ID:type           {: RESULT = new Parameter(loc(fieldxleft, typexright), field, type); :}
+;
+
+parameters ::=
+  /* empty */                            {: RESULT = List.empty(); :}
+| parameter:x parametersRest:xs          {: RESULT = xs.prepend(x); :}
+;
+
+parametersRest ::=
+  /* empty */                         {: RESULT = List.empty(); :}
+| COMMA parameter:x parametersRest:xs {: RESULT = xs.prepend(x); :}
+;
+
 decvar ::=
   VAR:v ID:x COLON ID:t EQ exp:e {: RESULT = new DecVar(loc(vxleft,exright), x, t, e); :}
 | VAR:v ID:x EQ exp:e            {: RESULT = new DecVar(loc(vxleft,exright), x, null, e); :}
@@ -131,20 +174,38 @@ dectypes ::=
 | dectype:d dectypes:ds          {: RESULT = ds.prepend(d); :}
 ;
 
+decfunction ::=
+  FUNCTION:f ID:name LPAREN parameters:p RPAREN COLON ID:type EQ exp:e        {: RESULT = new DecFunction(loc(fxleft,exright), name, p, type, e); :}
+;
+
+decfunctions ::=
+  decfunction:d                          {: RESULT = List.of(d); :}
+| decfunction:d decfunctions:ds          {: RESULT = ds.prepend(d); :}
+;
+
 decs ::=
   decs_beg_with_variable:ds    {: RESULT = ds; :}
 | decs_beg_with_type:ds        {: RESULT = ds; :}
+| decs_beg_with_function:ds        {: RESULT = ds; :}
 ;
 
 decs_beg_with_variable ::=
   decvar:d                           {: RESULT = List.of(d); :}
 | decvar:d decs_beg_with_variable:ds {: RESULT = ds.prepend(d); :}
 | decvar:d decs_beg_with_type:ds     {: RESULT = ds.prepend(d); :}
+| decvar:d decs_beg_with_function:ds     {: RESULT = ds.prepend(d); :}
 ;
 
 decs_beg_with_type ::=
   dectypes:dt                           {: RESULT = List.of(new DecTypeMutual(loc(dtxleft,dtxright), dt)); :}
 | dectypes:dt decs_beg_with_variable:ds {: RESULT = ds.prepend(new DecTypeMutual(loc(dtxleft,dtxright), dt)); :}
+| dectypes:dt decs_beg_with_function:ds {: RESULT = ds.prepend(new DecTypeMutual(loc(dtxleft,dtxright), dt)); :}
+;
+
+decs_beg_with_function ::=
+  decfunctions:dt                           {: RESULT = List.of(new DecFunctionMutual(loc(dtxleft,dtxright), dt)); :}
+| decfunctions:dt decs_beg_with_variable:ds {: RESULT = ds.prepend(new DecFunctionMutual(loc(dtxleft,dtxright), dt)); :}
+| decfunctions:dt decs_beg_with_type:ds     {: RESULT = ds.prepend(new DecFunctionMutual(loc(dtxleft,dtxright), dt)); :}
 ;
 
 var ::=
@@ -152,5 +213,7 @@ var ::=
 ;
 
 ty ::=
-  ID:id                       {: RESULT = new TyName(loc(idxleft,idxright), id); :}
+  ID:id                           {: RESULT = new TyName(loc(idxleft,idxright), id); :}
+| LBRACKET:l ID:id RBRACKET:r     {: RESULT = new TyArray(loc(lxleft,rxright), id); :}
+| LKEY:l exps:e RKEY:r            {: RESULT = new TyRecord(loc(lxleft,rxright), e); :}
 ;

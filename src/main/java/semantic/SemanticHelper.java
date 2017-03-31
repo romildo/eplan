@@ -21,8 +21,28 @@ public interface SemanticHelper {
       return new CompilerError(loc, "type mismatch: found %s but expected %s", found, builder);
    }
 
+   static CompilerError errorArray(Loc loc, Type found) {
+      return new CompilerError(loc, "type mismatch: found %s but expected ARRAY", found);
+   }
+
    static CompilerError undefined(Loc loc, String category, String name) {
       return new CompilerError(loc, "undefined %s '%s'", category, name);
+   }
+
+   static CompilerError errorBreak(Loc loc) {
+      return new CompilerError(loc, "unexpected 'break'");
+   }
+
+   static CompilerError syntaxError(Loc loc) {
+      return new CompilerError(loc, "syntax-error: Only declare record fields here");
+   }
+
+   static CompilerError fieldAlreadyExists(Loc loc) {
+      return new CompilerError(loc, "syntax-error: A field with this name already exists");
+   }
+
+   static CompilerError functionAlreadyExist(Loc loc) {
+      return new CompilerError(loc, "syntax-error: A function with this name already exists");
    }
 
    static CompilerError notAFunction(Loc loc, String name) {

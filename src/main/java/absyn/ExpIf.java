@@ -26,7 +26,7 @@ public class ExpIf extends Exp {
       List<Tree.Node<String>> children = List.of(test.toTree(), alt1.toTree());
       if (alt2 != null)
          children = children.append(alt2.toTree());
-      return Tree.of(annotateType("ExpIf: "), children);
+      return Tree.of(annotateType("ExpIf"), children);
    }
 
    @Override

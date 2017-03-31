@@ -234,6 +234,7 @@ public class SemantGui extends JFrame implements ActionListener {
          logArea.append(e.getMessage());
       }
       catch (Exception e) {
+         e.printStackTrace();
          JOptionPane.showMessageDialog(SemantGui.this,
                                        "Error compiling program\n",
                                        "Internal error compiling program\n" +
