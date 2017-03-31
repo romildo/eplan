@@ -3,15 +3,16 @@ package absyn;
 import env.Env;
 import javaslang.collection.Tree;
 import parse.Loc;
+import types.ARRAY;
 import types.Type;
 
 import static semantic.SemanticHelper.undefined;
 
-public class TyName extends Ty {
+public class TyArray extends Ty {
 
     public final String name;
 
-    public TyName(Loc loc, String name) {
+    public TyArray(Loc loc, String name) {
         super(loc);
         this.name = name;
     }
@@ -22,11 +23,11 @@ public class TyName extends Ty {
         if (t == null) {
             throw undefined(loc, "type", name);
         }
-        return t;
+        return new ARRAY(t);
     }
 
     @Override
     public Tree.Node<String> toTree() {
-        return Tree.of("TyName: " + name);
+        return Tree.of("TyArray: " + name);
     }
 }
