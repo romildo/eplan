@@ -45,7 +45,7 @@ terminal String ID;
 terminal        PLUS, MINUS, TIMES, DIV, UMINUS;
 terminal        AND, OR;
 terminal        LESS, LESSEG, MORE, MOREEG, EQUALS, DIF;
-terminal        LPAREN, RPAREN, LBRACKET, RBRACKET, AT;
+terminal        LPAREN, RPAREN, LBRACKET, RBRACKET, LBRACE, RBRACE, AT, DOT;
 terminal        COMMA, SEMICOLON;
 terminal        VAR, EQ, COLON;
 terminal        LET, IN;
@@ -67,10 +67,12 @@ non terminal List<Dec> decs;
 non terminal List<Dec> decs_beg_with_variable, decs_beg_with_type, decs_beg_with_function;
 non terminal Var       var;
 non terminal Ty        ty;
-non terminal List<Param> params;
+non terminal List<Param> params, paramsRest;
 non terminal Param     param;
 non terminal DecFunction decfunction;
 non terminal List<DecFunction> decfunctions;
+non terminal List<ParamAssign> paramsAssign, paramsAssignRest;
+non terminal ParamAssign     paramAssign;
 
 precedence left OR;
 precedence left AND;
@@ -113,6 +115,7 @@ exp ::=
 | BREAK:x                                  {: RESULT = new ExpBreak(loc(xxleft,xxright)); :}
 | WHILE:i exp:t DO exp:a                   {: RESULT = new ExpWhile(loc(ixleft,axright), t, a); :}
 | AT:i ID:id LBRACKET exps:x RBRACKET:r    {: RESULT = new ExpArray(loc(ixleft,rxright),id, x); :}
+| AT:i ID:id LBRACE paramsAssign:p RBRACE:r{: RESULT = new ExpRecord(loc(ixleft,rxright),id, p); :}
 ;
 
 exps ::=
@@ -186,11 +189,13 @@ decs_beg_with_type ::=
 var ::=
   ID:v                              {: RESULT = new VarSimple(loc(vxleft,vxright), v); :}
 | var:v LBRACKET exp:e RBRACKET:r   {: RESULT = new VarSubscript(loc(vxleft,rxright), v, e); :}
+| var:v DOT ID:id                   {: RESULT = new VarField(loc(vxleft,idxright), v, id); :}
 ;
 
 ty ::=
-  ID:id                       {: RESULT = new TyName(loc(idxleft,idxright), id); :}
-| LBRACKET:l ID:id RBRACKET:r {: RESULT = new TyArray(loc(lxleft,rxright), id); :}
+  ID:id                            {: RESULT = new TyName(loc(idxleft,idxright), id); :}
+| LBRACKET:l ID:id RBRACKET:r      {: RESULT = new TyArray(loc(lxleft,rxright), id); :}
+| LBRACE:l params:p RBRACE:r       {: RESULT = new TyRecord(loc(lxleft,rxright), p); :}
 ;
 
 param ::=
@@ -198,6 +203,25 @@ param ::=
 ;
 
 params ::=
-  param:p                       {: RESULT = List.of(p); :}
-| param:p COMMA params:ds       {: RESULT = ds.prepend(p); :}
+  /* empty */                           {: RESULT = List.empty(); :}
+| param:p paramsRest:ps                 {: RESULT = ps.prepend(p); :}
+;
+
+paramsRest ::=
+  /* empty */                           {: RESULT = List.empty(); :}
+| COMMA param:p paramsRest:ps           {: RESULT = ps.prepend(p); :}
+;
+
+paramAssign ::=
+  ID:id EQ exp:e                {: RESULT = new ParamAssign(loc(idxleft,exright), id, e); :}
+;
+
+paramsAssign ::=
+  /* empty */                               {: RESULT = List.empty(); :}
+| paramAssign:p paramsAssignRest:ps         {: RESULT = ps.prepend(p); :}
+;
+
+paramsAssignRest ::=
+  /* empty */                               {: RESULT = List.empty(); :}
+| COMMA paramAssign:p paramsAssignRest:ps   {: RESULT = ps.prepend(p); :}
 ;
