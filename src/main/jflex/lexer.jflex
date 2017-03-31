@@ -84,6 +84,10 @@ in                   { return tok(IN); }
 if                   { return tok(IF); }
 then                 { return tok(THEN); }
 else                 { return tok(ELSE); }
+break                { return tok(BREAK); }
+while                { return tok(WHILE); }
+do                   { return tok(DO); }
+function             { return tok(FUNCTION); }
 
 {id}                 { return tok(ID, yytext().intern()); }
 
@@ -93,6 +97,12 @@ else                 { return tok(ELSE); }
 "/"                  { return tok(DIV); }
 "&&"                 { return tok(AND); }
 "||"                 { return tok(OR); }
+"<"                  { return tok(LESS); }
+"<="                 { return tok(LESSEG); }
+">"                  { return tok(MORE); }
+">="                 { return tok(MOREEG); }
+"=="                 { return tok(EQUALS); }
+"!="                 { return tok(DIF); }
 "("                  { return tok(LPAREN); }
 ")"                  { return tok(RPAREN); }
 ","                  { return tok(COMMA); }
@@ -100,5 +110,11 @@ else                 { return tok(ELSE); }
 ":"                  { return tok(COLON); }
 "="                  { return tok(EQ); }
 ":="                 { return tok(ASSIGN); }
+"["                  { return tok(LBRACKET); }
+"]"                  { return tok(RBRACKET); }
+"@"                  { return tok(AT); }
+"{"                  { return tok(LBRACE); }
+"}"                  { return tok(RBRACE); }
+"."                  { return tok(DOT); }
 
 .                    { throw error(Loc.loc(locLeft()), "unexpected char '%s'", yytext()); }

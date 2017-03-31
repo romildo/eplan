@@ -27,7 +27,7 @@ public class ExpLet extends Exp {
 
    @Override
    protected Type semantic_(Env env) {
-      env.tenv.beginScope();;
+      env.tenv.beginScope();
       env.venv.beginScope();
       decs.forEach(d -> d.semantic(env));
       Type t_body = body.semantic(env);
