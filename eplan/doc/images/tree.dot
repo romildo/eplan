@@ -1,0 +1,22 @@
+digraph tree {
+  lbl8 [label="Anthony"];
+  lbl6 [label="Peter"];
+  lbl7 [label="Paul
+Palucci"];
+  lbl0 [label="Ann"];
+  lbl1 [label="Mary"];
+  lbl4 [label="Karen"];
+  lbl5 [label="Steven
+Abbot
+Braddock"];
+  lbl2 [label="John"];
+  lbl3 [label="Avila"];
+  lbl0 -> lbl1;
+  lbl1 -> lbl2;
+  lbl2 -> lbl3;
+  lbl1 -> lbl4;
+  lbl1 -> lbl5;
+  lbl0 -> lbl6;
+  lbl6 -> lbl7;
+  lbl6 -> lbl8;
+}

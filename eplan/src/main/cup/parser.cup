@@ -1,0 +1,121 @@
+package parse;
+
+import error.ErrorHelper;
+import java_cup.runtime.Symbol;
+import java_cup.runtime.ComplexSymbolFactory.ComplexSymbol;
+import javaslang.collection.List;
+import absyn.*;
+
+parser code {:
+  public Parser(Lexer lex) {
+     this(lex, lex.getSymbolFactory());
+  }
+
+  private Loc loc(Location left, Location right) {
+     return Loc.loc(left, right);
+  }
+
+  /* override error routines */
+  private Loc locOfInfo(Object info) {
+     return info instanceof ComplexSymbol ?
+               Loc.loc((ComplexSymbol) info) :
+               info instanceof Symbol ?
+                  Loc.loc((Symbol) info) :
+                  Loc.loc(cur_token);
+  }
+  private String lexemeOfInfo(Object info) {
+     return info instanceof ComplexSymbol ?
+               " at '" + ((ComplexSymbol) info).getName() + "'" :
+               "";
+
+  }
+  public void report_fatal_error(String message, Object info) {
+     done_parsing();
+     throw ErrorHelper.error(locOfInfo(info), "%s%s%nCan't recover from previous error(s), giving up.", message, lexemeOfInfo(info));
+  }
+  public void report_error(String message, Object info) {
+     throw ErrorHelper.error(locOfInfo(info), "%s%s", message, lexemeOfInfo(info));
+  }
+:};
+
+terminal String LITINT;
+terminal String LITREAL;
+terminal String LITBOOL;
+terminal String ID;
+terminal        PLUS, MINUS, TIMES, DIV, UMINUS;
+terminal        AND, OR;
+terminal        LPAREN, RPAREN;
+terminal        COMMA, SEMICOLON;
+terminal        VAR, EQ, COLON;
+terminal        LET, IN;
+
+non terminal Exp       program;
+non terminal Exp       exp;
+non terminal List<Exp> exps, expsRest;
+non terminal List<Exp> expseq, expseqRest;
+non terminal Dec       dec;
+non terminal List<Dec> decs;
+non terminal Var       var;
+
+precedence left OR;
+precedence left AND;
+precedence left PLUS, MINUS;
+precedence left TIMES, DIV;
+precedence left UMINUS;
+
+start with program;
+
+program ::=
+  exp:e                        {: RESULT = e; :}
+;
+
+exp ::=
+  exp:x PLUS exp:y             {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.PLUS, x, y); :}
+| exp:x MINUS exp:y            {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.MINUS, x, y); :}
+| exp:x TIMES exp:y            {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.TIMES, x, y); :}
+| exp:x DIV exp:y              {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.DIV, x, y); :}
+| exp:x AND exp:y              {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.AND, x, y); :}
+| exp:x OR exp:y               {: RESULT = new ExpBinOp(loc(xxleft,yxright), ExpBinOp.Op.OR, x, y); :}
+| LITINT:x                     {: RESULT = new ExpInt(loc(xxleft,xxright), x); :}
+| LITREAL:x                    {: RESULT = new ExpReal(loc(xxleft,xxright), x); :}
+| LITBOOL:x                    {: RESULT = new ExpBool(loc(xxleft,xxright), x); :}
+| MINUS:m exp:x                {: RESULT = new ExpNegate(loc(mxleft,xxright), x); :}  %prec UMINUS
+| ID:f LPAREN exps:x RPAREN:r  {: RESULT = new ExpCall(loc(fxleft,rxright), f, x); :}
+| var:v                        {: RESULT = new ExpVar(loc(vxleft,vxright), v); :}
+| LET:l decs:ds IN exp:b       {: RESULT = new ExpLet(loc(lxleft,bxright), ds, b); :}
+| LPAREN:l expseq:es RPAREN:r  {: RESULT = new ExpSeq(loc(lxleft,rxright), es); :}
+;
+
+exps ::=
+  /* empty */                  {: RESULT = List.empty(); :}
+| exp:x expsRest:xs            {: RESULT = xs.prepend(x); :}
+;
+
+expsRest ::=
+  /* empty */                  {: RESULT = List.empty(); :}
+| COMMA exp:x expsRest:xs      {: RESULT = xs.prepend(x); :}
+;
+
+expseq ::=
+  /* empty */                  {: RESULT = List.empty(); :}
+| exp:x expseqRest:xs          {: RESULT = xs.prepend(x); :}
+;
+
+expseqRest ::=
+  /* empty */                   {: RESULT = List.empty(); :}
+| SEMICOLON exp:x expseqRest:xs {: RESULT = xs.prepend(x); :}
+;
+
+dec ::=
+  VAR:v ID:x COLON ID:t EQ exp:e {: RESULT = new DecVar(loc(vxleft,exright), x, t, e); :}
+| VAR:v ID:x EQ exp:e            {: RESULT = new DecVar(loc(vxleft,exright), x, null, e); :}
+;
+
+decs ::=
+  dec:x                        {: RESULT = List.of(x); :}
+| dec:x decs:xs                {: RESULT = xs.prepend(x); :}
+;
+
+var ::=
+  ID:v                         {: RESULT = new VarSimple(loc(vxleft,vxright), v); :}
+;

@@ -1,0 +1,145 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/maven-v4_0_0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+
+   <groupId>br.ufop.decom.bcc328</groupId>
+   <artifactId>eplan</artifactId>
+   <version>0.1-SNAPSHOT</version>
+   <packaging>jar</packaging>
+
+   <name>EPlan compiler</name>
+   <url>https://github.com/romildo/eplan</url>
+
+   <properties>
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+      <maven.compiler.source>1.8</maven.compiler.source>
+      <maven.compiler.target>1.8</maven.compiler.target>
+   </properties>
+
+   <dependencies>
+      <dependency>
+         <groupId>com.beust</groupId>
+         <artifactId>jcommander</artifactId>
+         <version>1.58</version>
+      </dependency>
+
+      <dependency>
+         <groupId>com.github.vbmacher</groupId>
+         <artifactId>java-cup-runtime</artifactId>
+         <version>11b-20160615</version>
+      </dependency>
+
+      <dependency>
+         <groupId>org.apache.commons</groupId>
+         <artifactId>commons-lang3</artifactId>
+         <version>3.5</version>
+      </dependency>
+
+      <dependency>
+         <groupId>io.javaslang</groupId>
+         <artifactId>javaslang</artifactId>
+         <version>2.0.5</version>
+      </dependency>
+
+      <dependency>
+         <groupId>io.javaslang</groupId>
+         <artifactId>javaslang-render</artifactId>
+         <version>2.0.0</version>
+      </dependency>
+
+      <dependency>
+         <groupId>junit</groupId>
+         <artifactId>junit</artifactId>
+         <version>4.12</version>
+         <scope>test</scope>
+      </dependency>
+
+      <dependency>
+         <groupId>org.assertj</groupId>
+         <artifactId>assertj-core</artifactId>
+         <version>3.6.2</version>
+         <scope>test</scope>
+      </dependency>
+   </dependencies>
+
+   <build>
+      <plugins>
+         <plugin>
+            <groupId>de.jflex</groupId>
+            <artifactId>jflex-maven-plugin</artifactId>
+            <version>1.6.1</version>
+            <executions>
+               <execution>
+                  <goals>
+                     <goal>generate</goal>
+                  </goals>
+               </execution>
+            </executions>
+         </plugin>
+
+         <plugin>
+            <groupId>com.github.vbmacher</groupId>
+            <artifactId>cup-maven-plugin</artifactId>
+            <version>11b-20160615</version>
+            <executions>
+               <execution>
+                  <goals>
+                     <goal>generate</goal>
+                  </goals>
+               </execution>
+            </executions>
+            <configuration>
+               <packageName>parse</packageName>
+               <className>Parser</className>
+               <symbolsName>SymbolConstants</symbolsName>
+               <symbolsInterface>true</symbolsInterface>
+               <!-- Makes CUP generate xleft/xright handles for accessing Location objects for symbol start/end inside actions. -->
+               <locations>true</locations>
+            </configuration>
+         </plugin>
+
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <version>3.0.2</version>
+            <configuration>
+               <archive>
+                  <manifest>
+                     <mainClass>main.Driver</mainClass>
+                  </manifest>
+               </archive>
+            </configuration>
+         </plugin>
+
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-shade-plugin</artifactId>
+            <version>3.0.0</version>
+            <executions>
+               <execution>
+                  <phase>package</phase>
+                  <goals>
+                     <goal>shade</goal>
+                  </goals>
+                  <configuration>
+                     <transformers>
+                        <!-- add Main-Class to manifest file -->
+                        <transformer
+                              implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                           <mainClass>main.Driver</mainClass>
+                        </transformer>
+                     </transformers>
+                  </configuration>
+               </execution>
+            </executions>
+            <configuration>
+               <finalName>uber-${project.artifactId}-${project.version}
+               </finalName>
+            </configuration>
+         </plugin>
+      </plugins>
+   </build>
+
+</project>

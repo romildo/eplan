@@ -1,0 +1,12 @@
+#! /bin/sh
+
+if [ -x nixos-version ]; then
+    if nixos-version &>/dev/null; then
+        export LD_LIBRARY_PATH=/nix/store/2vcyb5n74xh8c97rb6pnr25cdyav9x0f-gcc-5.4.0/lib64
+    fi
+fi
+
+# export LC_NUMERIC=en_US-UTF-8
+
+exec java -jar target/uber-eplan-0.1-SNAPSHOT.jar $@
+

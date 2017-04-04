@@ -1,0 +1,21 @@
+#! /bin/sh
+
+F=unknown
+IMGVIEWER=eog
+
+if command -v which >/dev/null 2>&1; then
+    rlwrap ./driver --box-annotated-ast --dot-annotated-ast $@
+else
+    ./driver $@
+fi || exit $?
+
+if command -v dot >/dev/null 2>&1; then
+    echo "Generating image of AST"
+    echo "-------------------------------------------------"
+    dot -O -Tpng $F.annotated.dot
+    if command -v $IMGVIEWER >/dev/null 2>&1; then
+        echo "View image of AST"
+        echo "-------------------------------------------------"
+        $IMGVIEWER $F.annotated.dot.png &> /dev/null
+    fi
+fi
